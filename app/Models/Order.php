@@ -15,13 +15,25 @@ class Order extends Model
     protected $fillable = [
         'customer_id', 'total_harga', 'status', 'jenis',
         'tanggal_booking', 'jam_booking', 'catatan',
-        'metode_bayar', 'status_bayar', 'bukti_bayar', 'alamat_kirim',
+        'metode_bayar', 'kanal_bayar', 'status_bayar', 'bukti_bayar',
+        'alamat_kirim', 'no_ref', 'dibayar_pada',
     ];
 
     protected $casts = [
         'tanggal_booking' => 'date',
+        'dibayar_pada'    => 'datetime',
         'total_harga'     => 'decimal:2',
     ];
+
+    public function getHasLayananAttribute(): bool
+    {
+        return $this->orderItems->whereNotNull('layanan_id')->isNotEmpty();
+    }
+
+    public function getHasProdukAttribute(): bool
+    {
+        return $this->orderItems->whereNotNull('produk_id')->isNotEmpty();
+    }
 
     public function customer()
     {

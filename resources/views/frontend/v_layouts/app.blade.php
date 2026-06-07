@@ -35,8 +35,7 @@
         <nav>
             <ul class="st-nav__menu" id="stMenu">
                 <li><a class="st-nav__link {{ request()->routeIs('beranda') ? 'is-active' : '' }}" href="{{ route('beranda') }}">Beranda</a></li>
-                <li><a class="st-nav__link {{ request()->routeIs('front.layanan*') ? 'is-active' : '' }}" href="{{ route('front.layanan') }}">Layanan</a></li>
-                <li><a class="st-nav__link {{ request()->routeIs('front.produk*') ? 'is-active' : '' }}" href="{{ route('front.produk') }}">Produk</a></li>
+                <li><a class="st-nav__link {{ request()->routeIs('front.catalog') || request()->routeIs('front.layanan*') || request()->routeIs('front.produk*') ? 'is-active' : '' }}" href="{{ route('front.catalog') }}">Katalog</a></li>
                 <li><a class="st-nav__link {{ request()->routeIs('front.barber') ? 'is-active' : '' }}" href="{{ route('front.barber') }}">Barber</a></li>
                 <li><a class="st-nav__link {{ request()->routeIs('front.galeri') ? 'is-active' : '' }}" href="{{ route('front.galeri') }}">Galeri</a></li>
             </ul>

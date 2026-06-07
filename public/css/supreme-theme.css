@@ -98,6 +98,8 @@
 .btn--outline { --btn-bg: transparent; --btn-fg: var(--c-ink); --btn-bd: var(--c-ink); }
 .btn--outline:hover { --btn-bg: var(--c-ink); --btn-fg: var(--c-ice); }
 .btn--light { --btn-bg: var(--c-ice); --btn-fg: var(--c-ink); --btn-bd: var(--c-ice); }
+.btn--outline-light { --btn-bg: transparent; --btn-fg: var(--c-ice); --btn-bd: var(--c-ice); }
+.btn--outline-light:hover { --btn-bg: var(--c-ice); --btn-fg: var(--c-ink); --btn-bd: var(--c-ice); }
 .btn--ghost { --btn-bg: transparent; --btn-fg: var(--c-primary); --btn-bd: transparent; padding-inline: .4em; }
 .btn--ghost:hover { box-shadow: none; --btn-fg: var(--c-primary-600); }
 .btn--sm { font-size: var(--fs-xs); padding: .6em 1.1em; }
@@ -217,3 +219,62 @@
 .st-muted { color: var(--c-ink-soft); }
 .st-empty { text-align: center; padding: var(--sp-10) 0; color: var(--c-ink-soft); }
 .st-empty i { font-size: 3rem; color: var(--c-line); }
+
+/* ---------- 14. CATALOG TABS ---------- */
+.st-tabs { display:flex; justify-content:center; gap:var(--sp-2); margin-bottom:var(--sp-8); flex-wrap:wrap; }
+.st-tab { font-family:var(--font-body); font-weight:600; font-size:var(--fs-sm); text-transform:uppercase; letter-spacing:.03em;
+  padding:.7em 1.5em; border-radius:var(--radius-pill); border:2px solid var(--c-line); background:#fff; color:var(--c-ink); cursor:pointer; transition:.2s var(--ease); }
+.st-tab:hover { border-color:var(--c-primary); color:var(--c-primary); }
+.st-tab.is-active { background:var(--c-primary); border-color:var(--c-primary); color:var(--c-ice); }
+.st-tabpane { display:none; }
+.st-tabpane.is-active { display:block; }
+
+/* ---------- 15. PAYMENT ---------- */
+.pay-wrap { display:grid; grid-template-columns: 1.5fr 1fr; gap:var(--sp-6); align-items:start; }
+@media (max-width:860px){ .pay-wrap { grid-template-columns:1fr; } }
+.pay-card { background:#fff; border:1px solid var(--c-line); border-radius:var(--radius-lg); padding:var(--sp-6); }
+.pay-tabs { display:flex; gap:var(--sp-2); border-bottom:1px solid var(--c-line); margin-bottom:var(--sp-5); flex-wrap:wrap; }
+.pay-tabbtn { background:none; border:0; border-bottom:3px solid transparent; padding:.7em 1em; font-family:var(--font-body); font-weight:600;
+  font-size:var(--fs-sm); text-transform:uppercase; letter-spacing:.03em; color:var(--c-ink-soft); cursor:pointer; transition:.2s var(--ease); }
+.pay-tabbtn:hover { color:var(--c-primary); }
+.pay-tabbtn.is-active { color:var(--c-primary); border-bottom-color:var(--c-primary); }
+.pay-pane { display:none; }
+.pay-pane.is-active { display:block; }
+.pay-channels { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-3); }
+@media (max-width:480px){ .pay-channels { grid-template-columns:1fr; } }
+.pay-channel { position:relative; display:flex; align-items:center; gap:var(--sp-3); border:2px solid var(--c-line); border-radius:var(--radius);
+  padding:var(--sp-3) var(--sp-4); cursor:pointer; transition:.18s var(--ease); }
+.pay-channel:hover { border-color:var(--c-primary); }
+.pay-channel input { position:absolute; opacity:0; }
+.pay-channel__logo { width:46px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px;
+  font-weight:800; font-size:.7rem; color:#fff; letter-spacing:.02em; }
+.pay-channel__name { font-weight:600; font-size:var(--fs-sm); }
+.pay-channel__no { font-size:var(--fs-xs); color:var(--c-ink-soft); }
+.pay-channel:has(input:checked) { border-color:var(--c-primary); box-shadow:0 0 0 3px var(--c-primary-050); }
+.pay-channel:has(input:checked)::after { content:'\2713'; position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  color:var(--c-primary); font-weight:800; }
+.pay-note { background:var(--c-surface); border-radius:var(--radius); padding:var(--sp-4); font-size:var(--fs-sm); color:var(--c-ink-soft); margin-top:var(--sp-4); }
+.pay-summary__row { display:flex; justify-content:space-between; font-size:var(--fs-sm); margin-bottom:var(--sp-2); }
+.pay-summary__total { display:flex; justify-content:space-between; align-items:baseline; border-top:1px solid var(--c-line); margin-top:var(--sp-3); padding-top:var(--sp-3); }
+.pay-summary__total b:last-child { font-family:var(--font-display); font-size:var(--fs-2xl); color:var(--c-primary); }
+
+/* Brand colours for e-wallet/bank chips */
+.logo-ovo{background:#4c2a86} .logo-dana{background:#118eea} .logo-gopay{background:#00aa13} .logo-shopee{background:#ee4d2d}
+.logo-bca{background:#0060af} .logo-bni{background:#ec6726} .logo-mandiri{background:#003d79} .logo-bri{background:#00529c} .logo-qris{background:#1a1a1a}
+
+/* ---------- 16. STRUK / RECEIPT ---------- */
+.struk-page { background:var(--c-surface); min-height:80vh; padding-block:var(--sp-8); }
+.struk { max-width:420px; margin:0 auto; background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow);
+  padding:var(--sp-6); font-family:'Inter',monospace; }
+.struk__head { text-align:center; border-bottom:2px dashed var(--c-line); padding-bottom:var(--sp-4); margin-bottom:var(--sp-4); }
+.struk__brand { font-family:var(--font-display); font-size:1.5rem; text-transform:uppercase; }
+.struk__brand span{ color:var(--c-primary); }
+.struk__paid { display:inline-block; margin-top:var(--sp-2); border:2px solid var(--c-success); color:var(--c-success);
+  font-weight:700; text-transform:uppercase; font-size:var(--fs-xs); letter-spacing:.1em; padding:.2em .8em; border-radius:var(--radius-pill); }
+.struk__row { display:flex; justify-content:space-between; gap:var(--sp-4); font-size:var(--fs-sm); margin-bottom:var(--sp-2); }
+.struk__row span:first-child{ color:var(--c-ink-soft); }
+.struk__items { border-block:2px dashed var(--c-line); padding-block:var(--sp-3); margin-block:var(--sp-3); }
+.struk__item { display:flex; justify-content:space-between; font-size:var(--fs-sm); margin-bottom:var(--sp-2); }
+.struk__total { display:flex; justify-content:space-between; font-weight:700; font-size:var(--fs-lg); margin-top:var(--sp-3); }
+.struk__foot { text-align:center; color:var(--c-ink-soft); font-size:var(--fs-xs); margin-top:var(--sp-4); border-top:2px dashed var(--c-line); padding-top:var(--sp-4); }
+@media print { .st-topbar,.st-nav,.st-footer,.struk-actions { display:none !important; } .struk-page{ background:#fff; } .struk{ box-shadow:none; } }

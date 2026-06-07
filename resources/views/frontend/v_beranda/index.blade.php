@@ -12,8 +12,8 @@
             <h1 class="st-hero__title">Tampil Rapi<br>&amp; <em>Bergaya</em></h1>
             <p class="st-hero__lead">Layanan barbershop premium dan produk perawatan rambut &amp; jenggot pilihan — dirawat oleh barber profesional.</p>
             <div class="st-hero__cta">
-                <x-button :href="route('front.layanan')" size="lg">Lihat Layanan</x-button>
-                <x-button :href="route('front.produk')" variant="light" size="lg">Belanja Produk</x-button>
+                <x-button :href="route('front.catalog')" size="lg">Lihat Katalog</x-button>
+                <x-button :href="route('front.catalog', ['tab' => 'produk'])" variant="outline-light" size="lg">Belanja Produk</x-button>
             </div>
         </div>
     </div>

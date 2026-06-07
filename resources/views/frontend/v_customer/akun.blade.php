@@ -94,12 +94,15 @@
                             @if ($order->status_bayar == 'belum' && $order->metode_bayar !== 'cash')
                                 <a href="{{ route('booking.payment', $order->id) }}" class="btn btn-sm btn-gold mt-2"><i class="bi bi-credit-card"></i> Bayar Sekarang</a>
                             @endif
+                            @if ($order->status_bayar == 'lunas')
+                                <a href="{{ route('booking.struk', $order->id) }}" class="btn btn-sm btn-outline-gold mt-2"><i class="bi bi-receipt"></i> Lihat Struk</a>
+                            @endif
                         </div>
                         @empty
                         <div class="text-center py-4">
                             <i class="bi bi-calendar-x text-muted" style="font-size:40px;"></i>
-                            <p class="text-muted mt-2">Belum ada riwayat booking.</p>
-                            <a href="{{ route('front.layanan') }}" class="btn btn-gold btn-sm">Booking Sekarang</a>
+                            <p class="text-muted mt-2">Belum ada riwayat pesanan.</p>
+                            <a href="{{ route('front.catalog') }}" class="btn btn-gold btn-sm">Mulai Belanja</a>
                         </div>
                         @endforelse
                     </div>

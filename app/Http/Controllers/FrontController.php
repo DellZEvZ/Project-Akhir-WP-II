@@ -105,4 +105,23 @@ class FrontController extends Controller
 
         return view('frontend.v_produk.detail', compact('produk', 'lainnya'));
     }
+
+    // Katalog gabungan: layanan + produk dalam satu halaman
+    public function catalog(Request $request)
+    {
+        $search = $request->search;
+        $tab    = $request->get('tab', 'layanan');
+
+        $layanans = Layanan::where('status', 'aktif')
+            ->when($search, fn ($q) => $q->where('nama_layanan', 'like', "%{$search}%"))
+            ->orderBy('harga')
+            ->get();
+
+        $produks = Produk::where('status', 1)
+            ->when($search, fn ($q) => $q->where('nama_produk', 'like', "%{$search}%"))
+            ->latest()
+            ->get();
+
+        return view('frontend.v_catalog.index', compact('layanans', 'produks', 'search', 'tab'));
+    }
 }

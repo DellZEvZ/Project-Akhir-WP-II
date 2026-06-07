@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use App\Models\Layanan;
 use App\Models\Produk;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Helpers\ImageHelper;
 
 class BookingController extends Controller
 {
@@ -31,10 +31,10 @@ class BookingController extends Controller
         $order->update(['total_harga' => $total]);
     }
 
-    // Tampilkan keranjang booking
+    // Tampilkan keranjang (layanan + produk)
     public function cart()
     {
-        $order = $this->getCart()->load('orderItems.layanan');
+        $order = $this->getCart()->load('orderItems.layanan', 'orderItems.produk');
         return view('frontend.v_booking.cart', compact('order'));
     }
 
@@ -59,7 +59,31 @@ class BookingController extends Controller
         $this->recalcTotal($order);
 
         return redirect()->route('booking.cart')
-            ->with('success', 'Layanan "' . $layanan->nama_layanan . '" ditambahkan ke booking.');
+            ->with('success', 'Layanan "' . $layanan->nama_layanan . '" ditambahkan ke keranjang.');
+    }
+
+    // Tambah produk ke keranjang
+    public function addProduk($id)
+    {
+        $produk = Produk::where('status', 1)->findOrFail($id);
+        $order  = $this->getCart();
+
+        $item = $order->orderItems()->where('produk_id', $produk->id)->first();
+
+        if ($item) {
+            $item->increment('qty');
+        } else {
+            $order->orderItems()->create([
+                'produk_id' => $produk->id,
+                'qty'       => 1,
+                'harga'     => $produk->harga,
+            ]);
+        }
+
+        $this->recalcTotal($order);
+
+        return redirect()->route('booking.cart')
+            ->with('success', 'Produk "' . $produk->nama_produk . '" ditambahkan ke keranjang.');
     }
 
     // Update qty item
@@ -90,41 +114,48 @@ class BookingController extends Controller
     // Halaman checkout
     public function checkout()
     {
-        $order = $this->getCart()->load('orderItems.layanan');
+        $order = $this->getCart()->load('orderItems.layanan', 'orderItems.produk');
 
         if ($order->orderItems->isEmpty()) {
-            return redirect()->route('booking.cart')->with('error', 'Keranjang booking masih kosong.');
+            return redirect()->route('booking.cart')->with('error', 'Keranjang masih kosong.');
         }
 
         return view('frontend.v_booking.checkout', compact('order'));
     }
 
-    // Konfirmasi booking
+    // Konfirmasi checkout — jadwal hanya untuk layanan, alamat hanya untuk produk
     public function confirm(Request $request)
     {
-        $request->validate([
-            'tanggal_booking' => 'required|date|after_or_equal:today',
-            'jam_booking'     => 'required',
-            'catatan'         => 'nullable|string|max:500',
-        ], [
-            'tanggal_booking.after_or_equal' => 'Tanggal booking tidak boleh di masa lalu.',
-        ]);
+        $order = $this->getCart()->load('orderItems');
 
-        $order = $this->getCart();
-
-        if ($order->orderItems()->count() === 0) {
-            return redirect()->route('booking.cart')->with('error', 'Keranjang booking masih kosong.');
+        if ($order->orderItems->isEmpty()) {
+            return redirect()->route('booking.cart')->with('error', 'Keranjang masih kosong.');
         }
+
+        $rules    = ['catatan' => 'nullable|string|max:500'];
+        $messages = ['tanggal_booking.after_or_equal' => 'Tanggal booking tidak boleh di masa lalu.'];
+
+        if ($order->has_layanan) {
+            $rules['tanggal_booking'] = 'required|date|after_or_equal:today';
+            $rules['jam_booking']     = 'required';
+        }
+        if ($order->has_produk) {
+            $rules['alamat_kirim'] = 'required|string|max:500';
+        }
+
+        $request->validate($rules, $messages);
 
         $order->update([
             'status'          => 'confirmed',
+            'jenis'           => $order->has_layanan ? 'booking' : 'produk',
             'tanggal_booking' => $request->tanggal_booking,
             'jam_booking'     => $request->jam_booking,
+            'alamat_kirim'    => $request->alamat_kirim,
             'catatan'         => $request->catatan,
         ]);
 
         return redirect()->route('booking.payment', $order->id)
-            ->with('success', 'Booking dibuat! Silakan selesaikan pembayaran.');
+            ->with('success', 'Pesanan dikonfirmasi! Silakan selesaikan pembayaran.');
     }
 
     /**
@@ -142,44 +173,51 @@ class BookingController extends Controller
         return view('frontend.v_booking.payment', compact('order'));
     }
 
-    // Proses pembayaran (pilih metode + upload bukti bila transfer)
+    /**
+     * Proses pembayaran (SIMULASI). Metode: transfer bank / e-wallet / cash.
+     * transfer & e-wallet langsung dianggap lunas + menghasilkan struk;
+     * cash dibayar di tempat (belum lunas).
+     */
     public function pay(Request $request, $id)
     {
         $order = $this->ownedOrder($id);
 
         $request->validate([
-            'metode_bayar' => 'required|in:transfer,cash,ewallet',
-            'bukti'        => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'metode_bayar' => 'required|in:transfer,ewallet,cash',
+            'kanal_bayar'  => 'required_unless:metode_bayar,cash|nullable|string|max:50',
+        ], [
+            'kanal_bayar.required_unless' => 'Silakan pilih bank / e-wallet.',
         ]);
 
-        $data = ['metode_bayar' => $request->metode_bayar];
-
         if ($request->metode_bayar === 'cash') {
-            // Bayar di tempat → langsung tercatat, verifikasi saat kedatangan.
-            $data['status_bayar'] = 'belum';
-        } else {
-            // Transfer / e-wallet → butuh bukti, lalu menunggu verifikasi admin.
-            if ($request->hasFile('bukti')) {
-                $file     = $request->file('bukti');
-                $fileName = 'bukti_' . $order->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-                ImageHelper::storeImage($file, 'img-bukti', $fileName);
-                $data['bukti_bayar']  = $fileName;
-                $data['status_bayar'] = 'menunggu_verifikasi';
-            } else {
-                return back()->with('error', 'Silakan unggah bukti pembayaran untuk metode transfer / e-wallet.');
-            }
+            $order->update([
+                'metode_bayar' => 'cash',
+                'kanal_bayar'  => 'Bayar di Tempat',
+                'status_bayar' => 'belum',
+            ]);
+
+            return redirect()->route('customer.akun')
+                ->with('success', 'Pesanan dikonfirmasi. Pembayaran tunai dilakukan saat kedatangan/penerimaan.');
         }
 
-        // Untuk order produk, alamat pengiriman wajib diisi.
-        if ($order->jenis === 'produk') {
-            $request->validate(['alamat_kirim' => 'required|string|max:500']);
-            $data['alamat_kirim'] = $request->alamat_kirim;
-        }
+        // Simulasi pembayaran berhasil seketika.
+        $order->update([
+            'metode_bayar' => $request->metode_bayar,
+            'kanal_bayar'  => $request->kanal_bayar,
+            'status_bayar' => 'lunas',
+            'no_ref'       => 'BF-' . now()->format('ymdHis') . '-' . strtoupper(Str::random(4)),
+            'dibayar_pada' => now(),
+        ]);
 
-        $order->update($data);
+        return redirect()->route('booking.struk', $order->id)
+            ->with('success', 'Pembayaran berhasil! Berikut struk pembayaran Anda.');
+    }
 
-        return redirect()->route('customer.akun')
-            ->with('success', 'Pembayaran tercatat. Status: ' . $order->fresh()->status_bayar_label . '.');
+    // Struk / bukti pembayaran
+    public function struk($id)
+    {
+        $order = $this->ownedOrder($id)->load('orderItems.layanan', 'orderItems.produk', 'customer');
+        return view('frontend.v_booking.struk', compact('order'));
     }
 
     // Beli produk → buat order jenis 'produk' lalu menuju pembayaran

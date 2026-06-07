@@ -2,121 +2,104 @@
 @section('title', 'Pembayaran')
 
 @section('content')
-<section class="py-5" style="background:#f4f4f4;min-height:70vh;">
-    <div class="container">
-        <h3 class="font-head mb-4">PEMBAYARAN</h3>
-        <div class="row g-4">
-            <!-- Form pembayaran -->
-            <div class="col-md-7">
-                <div class="card card-bf">
-                    <div class="card-body p-4">
-                        <form action="{{ route('booking.pay', $order->id) }}" method="POST" enctype="multipart/form-data" id="payForm">
-                            @csrf
+<section class="st-section" style="background:var(--c-surface);min-height:70vh">
+    <div class="st-container">
+        <h1 class="st-head__title" style="margin-bottom:var(--sp-6)">Pembayaran</h1>
 
-                            @if ($order->jenis === 'produk')
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Alamat Pengiriman <span class="text-danger">*</span></label>
-                                <textarea name="alamat_kirim" class="form-control @error('alamat_kirim') is-invalid @enderror" rows="2"
-                                          placeholder="Alamat lengkap penerima" required>{{ old('alamat_kirim') }}</textarea>
-                                @error('alamat_kirim')<small class="text-danger">{{ $message }}</small>@enderror
-                            </div>
-                            <hr>
-                            @endif
+        <form action="{{ route('booking.pay', $order->id) }}" method="POST">
+            @csrf
+            <input type="hidden" name="metode_bayar" id="metodeField" value="transfer">
 
-                            <label class="form-label small fw-bold">Metode Pembayaran <span class="text-danger">*</span></label>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input metode" type="radio" name="metode_bayar" id="m_transfer" value="transfer" checked>
-                                    <label class="form-check-label" for="m_transfer"><i class="bi bi-bank text-gold"></i> Transfer Bank</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input metode" type="radio" name="metode_bayar" id="m_ewallet" value="ewallet">
-                                    <label class="form-check-label" for="m_ewallet"><i class="bi bi-wallet2 text-gold"></i> E-Wallet (OVO / GoPay / Dana)</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input metode" type="radio" name="metode_bayar" id="m_cash" value="cash">
-                                    <label class="form-check-label" for="m_cash"><i class="bi bi-cash text-gold"></i> Bayar di Tempat (Cash)</label>
-                                </div>
-                            </div>
-
-                            <!-- Info rekening (transfer/ewallet) -->
-                            <div id="infoBayar" class="alert alert-secondary small">
-                                <div id="infoTransfer">
-                                    <strong>Transfer ke:</strong><br>
-                                    BCA <strong>1234567890</strong> a.n. Barber Flow<br>
-                                    Mandiri <strong>0980980980</strong> a.n. Barber Flow
-                                </div>
-                                <div id="infoEwallet" style="display:none;">
-                                    <strong>E-Wallet:</strong><br>
-                                    OVO / GoPay / Dana: <strong>0812-3456-7890</strong> (Barber Flow)
-                                </div>
-                            </div>
-
-                            <!-- Upload bukti -->
-                            <div class="mb-3" id="buktiWrap">
-                                <label class="form-label small fw-bold">Upload Bukti Pembayaran <span class="text-danger">*</span></label>
-                                <input type="file" name="bukti" class="form-control @error('bukti') is-invalid @enderror" accept="image/*">
-                                @error('bukti')<small class="text-danger">{{ $message }}</small>@enderror
-                                <small class="text-muted">Format JPG/PNG, maks 2MB.</small>
-                            </div>
-
-                            <div id="infoCash" class="alert alert-info small" style="display:none;">
-                                <i class="bi bi-info-circle"></i> Pembayaran dilakukan langsung di tempat saat kedatangan.
-                            </div>
-
-                            <button type="submit" class="btn btn-gold btn-lg w-100"><i class="bi bi-check-circle"></i> Konfirmasi Pembayaran</button>
-                        </form>
+            <div class="pay-wrap">
+                {{-- Panel metode --}}
+                <div class="pay-card">
+                    <div class="pay-tabs">
+                        <button type="button" class="pay-tabbtn is-active" data-pane="transfer" data-metode="transfer"><i class="bi bi-bank"></i> Transfer Bank</button>
+                        <button type="button" class="pay-tabbtn" data-pane="ewallet" data-metode="ewallet"><i class="bi bi-wallet2"></i> E-Wallet</button>
+                        <button type="button" class="pay-tabbtn" data-pane="cash" data-metode="cash"><i class="bi bi-cash-coin"></i> Bayar di Tempat</button>
                     </div>
-                </div>
-            </div>
 
-            <!-- Ringkasan -->
-            <div class="col-md-5">
-                <div class="card card-bf">
-                    <div class="card-body p-4">
-                        <h5 class="font-head mb-3">Ringkasan Pesanan</h5>
-                        <p class="small text-muted mb-2">
-                            <span class="badge bg-dark-bf text-gold">{{ $order->jenis === 'produk' ? 'Pembelian Produk' : 'Booking Layanan' }}</span>
+                    {{-- Transfer Bank --}}
+                    <div class="pay-pane is-active" id="pane-transfer">
+                        <div class="pay-channels">
+                            @foreach ([['BCA','logo-bca','8800 1234 5678'],['BNI','logo-bni','9880 1234 5678'],['Mandiri','logo-mandiri','7000 1234 5678'],['BRI','logo-bri','0023 1234 5678']] as $b)
+                            <label class="pay-channel">
+                                <input type="radio" name="kanal_bayar" value="{{ $b[0] }}" data-group="transfer" @if($loop->first) checked @endif>
+                                <span class="pay-channel__logo {{ $b[1] }}">{{ $b[0] }}</span>
+                                <span><span class="pay-channel__name">Bank {{ $b[0] }}</span><br><span class="pay-channel__no">VA {{ $b[2] }}</span></span>
+                            </label>
+                            @endforeach
+                        </div>
+                        <div class="pay-note"><i class="bi bi-info-circle"></i> Transfer ke Virtual Account di atas. <strong>Simulasi:</strong> klik "Bayar Sekarang" untuk menandai lunas otomatis.</div>
+                    </div>
+
+                    {{-- E-Wallet --}}
+                    <div class="pay-pane" id="pane-ewallet">
+                        <div class="pay-channels">
+                            @foreach ([['OVO','logo-ovo'],['DANA','logo-dana'],['GoPay','logo-gopay'],['ShopeePay','logo-shopee']] as $w)
+                            <label class="pay-channel">
+                                <input type="radio" name="kanal_bayar" value="{{ $w[0] }}" data-group="ewallet">
+                                <span class="pay-channel__logo {{ $w[1] }}">{{ Str::limit($w[0],4,'') }}</span>
+                                <span><span class="pay-channel__name">{{ $w[0] }}</span><br><span class="pay-channel__no">0812-3456-7890</span></span>
+                            </label>
+                            @endforeach
+                        </div>
+                        <div class="pay-note"><i class="bi bi-phone"></i> Bayar via e-wallet ke nomor terdaftar. <strong>Simulasi</strong> pembayaran berhasil seketika.</div>
+                    </div>
+
+                    {{-- Cash --}}
+                    <div class="pay-pane" id="pane-cash">
+                        <div class="pay-note" style="background:var(--c-primary-050);color:var(--c-ink)">
+                            <i class="bi bi-shop"></i> Pembayaran tunai dilakukan langsung saat kedatangan (layanan) atau penerimaan (produk). Pesanan tetap dikonfirmasi.
+                        </div>
+                    </div>
+
+                    <x-button type="submit" size="lg" block style="margin-top:var(--sp-5)"><i class="bi bi-shield-check"></i> Bayar Sekarang</x-button>
+                </div>
+
+                {{-- Ringkasan --}}
+                <div class="pay-card">
+                    <h3 class="card__title" style="margin-bottom:var(--sp-4)">Ringkasan Pesanan</h3>
+                    @foreach ($order->orderItems as $item)
+                        <div class="pay-summary__row">
+                            <span>{{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }} <span class="st-muted">x{{ $item->qty }}</span></span>
+                            <span>Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</span>
+                        </div>
+                    @endforeach
+
+                    @if ($order->tanggal_booking)
+                        <p class="st-muted" style="font-size:var(--fs-sm);margin-top:var(--sp-3)">
+                            <i class="bi bi-calendar"></i> {{ $order->tanggal_booking->format('d M Y') }}
+                            <i class="bi bi-clock" style="margin-left:var(--sp-3)"></i> {{ $order->jam_booking ? \Carbon\Carbon::parse($order->jam_booking)->format('H:i') : '-' }} WIB
                         </p>
-                        @foreach ($order->orderItems as $item)
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="small">
-                                {{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }}
-                                <span class="text-muted">x{{ $item->qty }}</span>
-                            </span>
-                            <span class="small">Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</span>
-                        </div>
-                        @endforeach
-                        @if ($order->jenis === 'booking')
-                        <hr>
-                        <p class="small mb-1"><i class="bi bi-calendar text-gold"></i> {{ $order->tanggal_booking?->format('d M Y') }}</p>
-                        <p class="small mb-0"><i class="bi bi-clock text-gold"></i> {{ $order->jam_booking ? \Carbon\Carbon::parse($order->jam_booking)->format('H:i') : '-' }} WIB</p>
-                        @endif
-                        <hr>
-                        <div class="d-flex justify-content-between">
-                            <strong>Total</strong>
-                            <strong class="price-tag">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</strong>
-                        </div>
-                    </div>
+                    @endif
+                    @if ($order->alamat_kirim)
+                        <p class="st-muted" style="font-size:var(--fs-sm)"><i class="bi bi-geo-alt"></i> {{ $order->alamat_kirim }}</p>
+                    @endif
+
+                    <div class="pay-summary__total"><b>Total Bayar</b><b>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</b></div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </section>
 
 @push('scripts')
 <script>
-    function updateMetode() {
-        const val = document.querySelector('input[name="metode_bayar"]:checked').value;
-        const isCash = val === 'cash';
-        document.getElementById('buktiWrap').style.display = isCash ? 'none' : 'block';
-        document.getElementById('infoBayar').style.display = isCash ? 'none' : 'block';
-        document.getElementById('infoCash').style.display = isCash ? 'block' : 'none';
-        document.getElementById('infoTransfer').style.display = val === 'transfer' ? 'block' : 'none';
-        document.getElementById('infoEwallet').style.display = val === 'ewallet' ? 'block' : 'none';
-    }
-    document.querySelectorAll('.metode').forEach(r => r.addEventListener('change', updateMetode));
-    updateMetode();
+    const metodeField = document.getElementById('metodeField');
+    document.querySelectorAll('.pay-tabbtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const pane = btn.dataset.pane;
+            document.querySelectorAll('.pay-tabbtn').forEach(b => b.classList.toggle('is-active', b === btn));
+            document.querySelectorAll('.pay-pane').forEach(p => p.classList.toggle('is-active', p.id === 'pane-' + pane));
+            metodeField.value = btn.dataset.metode;
+            // pilih channel pertama pada grup aktif (selain cash)
+            if (pane !== 'cash') {
+                const first = document.querySelector('#pane-' + pane + ' input[type=radio]');
+                if (first && !document.querySelector('input[data-group=' + pane + ']:checked')) first.checked = true;
+            }
+        });
+    });
 </script>
 @endpush
 @endsection

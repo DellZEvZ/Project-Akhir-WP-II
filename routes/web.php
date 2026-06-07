@@ -29,6 +29,9 @@ Route::get('/galeri', [FrontController::class, 'galeri'])->name('front.galeri');
 Route::get('/produk', [FrontController::class, 'produk'])->name('front.produk');
 Route::get('/produk/{id}', [FrontController::class, 'produkDetail'])->name('front.produk.detail');
 
+// Katalog gabungan (layanan + produk)
+Route::get('/katalog', [FrontController::class, 'catalog'])->name('front.catalog');
+
 // Auth Customer
 Route::get('/login', [FrontCustomerController::class, 'loginPage'])->name('customer.login');
 Route::post('/login', [FrontCustomerController::class, 'login'])->name('customer.login.post');
@@ -47,6 +50,7 @@ Route::middleware('is.customer')->group(function () {
     // Booking
     Route::get('/booking', [BookingController::class, 'cart'])->name('booking.cart');
     Route::get('/booking/add/{id}', [BookingController::class, 'add'])->name('booking.add');
+    Route::get('/booking/add-produk/{id}', [BookingController::class, 'addProduk'])->name('booking.add.produk');
     Route::post('/booking/update/{itemId}', [BookingController::class, 'update'])->name('booking.update');
     Route::post('/booking/remove/{itemId}', [BookingController::class, 'remove'])->name('booking.remove');
     Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
@@ -55,6 +59,9 @@ Route::middleware('is.customer')->group(function () {
     // Pembayaran
     Route::get('/pembayaran/{id}', [BookingController::class, 'payment'])->name('booking.payment');
     Route::post('/pembayaran/{id}', [BookingController::class, 'pay'])->name('booking.pay');
+
+    // Struk / bukti pembayaran
+    Route::get('/struk/{id}', [BookingController::class, 'struk'])->name('booking.struk');
 
     // Pembelian produk
     Route::post('/produk/{id}/beli', [BookingController::class, 'buyProduk'])->name('produk.beli');
