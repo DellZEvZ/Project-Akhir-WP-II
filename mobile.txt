@@ -1,0 +1,153 @@
+## Proyek Akhir: Aplikasi Katalog Produk & Layanan "Barber Flow" (Men’s Grooming & Barber Shop)
+
+Anda memilih **proyek nomor 1 (Katalog Produk)** dengan tema **Barber Shop / Men’s Grooming** bernama **"Barber Flow"**. Aplikasi ini berfokus pada **front-end pelanggan** untuk menelusuri layanan (haircut, shave, facial, hair tonic, dll), produk perawatan rambut & jenggot, serta paket perawatan seperti **spa untuk pria**. Berikut elaborasi lengkapnya.
+
+---
+
+### A. Pengenalan Aplikasi "Barber Flow"
+
+**Barber Flow** adalah aplikasi mobile berbasis Flutter yang dirancang sebagai **etalase digital** bagi barbershop modern yang menyediakan layanan *mens grooming* premium. Pelanggan dapat:
+
+- Melihat daftar **layanan** (potong rambut, cukur jenggot, facial pria, creambath, hair tonic treatment, masker rambut, hand & foot massage, dll).
+- Melihat **produk** perawatan yang dijual (shampo, pomade, minyak jenggot, wax, toner, dll).
+- Melihat **paket perawatan** (misal: *Executive Grooming Package*, *Bridal Groom Package*, *Relaxing Spa for Men*).
+- Mencari layanan/produk berdasarkan kata kunci.
+- Melihat **detail** harga, durasi, deskripsi, dan gambar.
+- Menambahkan ke **keranjang sementara** (simulasi, karena modul belum sampai ke database).
+- Menekan tombol **"Pesan"** atau **"Booking"** yang akan mengarahkan ke form pemesanan sederhana (nama, jam, tanggal).
+
+Aplikasi ini **tidak memerlukan backend** (data statis dari `List<Map>`), namun sudah mencakup seluruh materi Mobile Programming I: `StatelessWidget`, `StatefulWidget`, `Navigator`, `Form`, `TextField`, `TextEditingController`, `BottomNavigationBar`, `GridView`, `ListView`, `Card`, `AssetImage`, dan parsing data.
+
+---
+
+### B. Latar Belakang Masalah
+
+1. **Digitalisasi UMKM Barbershop**  
+   Banyak barbershop tradisional belum memiliki media promosi digital yang interaktif. Pelanggan harus datang langsung atau menghubungi WhatsApp untuk tahu layanan dan harga.
+
+2. **Kurangnya Informasi Terstruktur**  
+   Layanan perawatan pria (facial, hair tonic, spa) sering tidak dijelaskan dengan baik. Pelanggan bingung membedakan satu layanan dengan lainnya.
+
+3. **Antrean dan Waktu Tunggu**  
+   Tanpa sistem pemesanan, pelanggan sering mengantri lama, terutama di akhir pekan.
+
+4. **Peluang Cross-Selling**  
+   Produk perawatan (pomade, minyak jenggot) jarang dipromosikan bersamaan dengan layanan. Aplikasi dapat meningkatkan penjualan produk.
+
+5. **Kebutuhan Pengalaman Mirip Spa untuk Pria**  
+   Pria modern mulai mencari perawatan relaksasi (pijat kepala, hand massage, terapi rambut). Namun belum ada aplikasi yang menyajikan paket *mens spa* dengan mudah.
+
+---
+
+### C. Studi Kasus Permasalahan (Orientasi Pengenalan)
+
+> **Kasus:**  
+> "Barber Shop 'Raja Gunting' di kota X memiliki 10 kursi dan 5 karyawan. Setiap Sabtu-Minggu, pelanggan menunggu hingga 90 menit. Keluhan utama: pelanggan tidak tahu layanan 'Royal Men's Spa' yang mencakup creambath + pijat kepala + masker rambut + hand massage. Akibatnya, layanan tersebut sepi peminat. Selain itu, banyak pelanggan yang ingin membeli pomade ram tapi tidak tahu harganya."
+>
+> **Solusi dengan Barber Flow:**  
+> Aplikasi ini akan menampilkan katalog lengkap layanan + produk + paket spa pria. Pelanggan bisa melihat harga, durasi, deskripsi, dan foto sebelum datang. Tombol "Pesan" akan mengarahkan ke form sederhana (nama, jam, pilihan layanan) – meskipun data hanya tersimpan sementara, ini memberikan gambaran alur booking. Dengan adanya fitur pencarian, pelanggan bisa cepat menemukan "Royal Men's Spa". Hasilnya: layanan premium lebih dikenal, antrean dapat diatur (simulasi booking), dan penjualan produk meningkat.
+
+---
+
+### D. Fitur Lengkap & Penerapan Poin Modul
+
+| No | Fitur | Poin Modul yang Diterapkan | Efektifitas | Kemudahan | Relatibilitas |
+|----|-------|----------------------------|-------------|------------|----------------|
+| 1 | Halaman **Welcome** | `Scaffold`, `SafeArea`, `ListView`, `Image.asset`, `SizedBox`, `ElevatedButton` (Registrasi & Login) | Tinggi (mengulang P09) | Mudah | Sangat tinggi (standar pembuka app) |
+| 2 | Halaman **Registrasi** & **Login** (simulasi, tanpa auth) | `StatefulWidget`, `TextField` dengan `prefixIcon`, `TextEditingController`, `Navigator.push` (P10, P11) | Tinggi (pengulangan form) | Mudah | Tinggi (pengguna familiar) |
+| 3 | **Bottom Navigation Bar** dengan 3 menu: **Beranda**, **Layanan**, **Produk** | `BottomNavigationBar`, `currentIndex`, `pageList` (P12) | Sangat tinggi (inti navigasi) | Mudah | Sangat tinggi (standar UI) |
+| 4 | **Halaman Beranda**: GridView katalog paket unggulan (misal: 3 paket spa pria) | `GridView.builder`, `Card`, `ClipRRect`, `Image.asset`, `Text`, `tombolPesan` komponen (P13) | Tinggi | Sedang (perhatikan mainAxisExtent) | Tinggi (menarik perhatian) |
+| 5 | **Halaman Layanan**: `GridView` semua layanan (10+ item) | Parsing data dari `List<Map<String,dynamic>>` (P05), `MobilCard` diadaptasi jadi `LayananCard` | Sangat tinggi (core katalog) | Sedang | Sangat tinggi (inti bisnis) |
+| 6 | **Halaman Produk**: `GridView` produk perawatan rambut/jenggot | Sama seperti #5, beda data source | Tinggi | Sedang | Tinggi (cross-selling) |
+| 7 | **SearchField** di AppBar (filter layanan/produk berdasarkan judul) | `StatefulWidget` dengan `setState`, `TextField` dengan `onChanged` (P06, P13) | Tinggi (mengajarkan state) | Sedang (perlu logika filter) | Sangat tinggi (memudahkan cari) |
+| 8 | **Halaman Detail** layanan/produk (setelah klik kartu) | `Navigator.push` + `MaterialPageRoute`, passing data via constructor (P05, P07) | Sangat tinggi | Mudah | Tinggi (detail penting) |
+| 9 | **Tombol "Pesan" / "Booking"** di halaman detail | `ElevatedButton` dengan `onPressed` navigasi ke halaman form pemesanan | Tinggi | Mudah | Sangat tinggi (aksi nyata) |
+| 10 | **Form Pemesanan Sederhana** (nama, tanggal, jam, catatan) | `StatefulWidget`, `GlobalKey<FormState>`, `TextFormField` dengan validator, `TextEditingController`, `showDatePicker` (P07) | Tinggi | Sedang (date picker baru) | Tinggi (meniru booking) |
+| 11 | **Halaman Ringkasan Pemesanan** (setelah submit form) | Parsing data dari form ke halaman baru, menampilkan detail pesanan (P07) | Sangat tinggi (integrasi) | Sedang (perhatikan passing data) | Tinggi (konfirmasi pesanan) |
+| 12 | **StatelessWidget untuk komponen reusable** (misal `ServiceCard`, `ProductCard`, `BookingButton`) | Membuat file terpisah di folder `widget/`, menggunakan `final` parameter (P05) | Tinggi (best practice) | Mudah | Tinggi (code rapi) |
+| 13 | **Asset gambar** (logo, foto layanan, produk) | Folder `assets/img/`, deklarasi di `pubspec.yaml`, `Image.asset` (P09) | Sangat tinggi | Mudah | Tinggi (visual penting) |
+| 14 | **Tampilan "Kosong" jika belum ada hasil pencarian** | `Conditional` (ternary) di `builder` menampilkan `Center(child: Text("Tidak ditemukan"))` | Sedang (tidak wajib tapi bagus) | Mudah | Tinggi (UX lebih baik) |
+| 15 | **Demo Stateful: Keranjang sementara** (opsional, nilai plus) | `StatefulWidget`, `List` untuk menyimpan item yang dipesan, `setState` saat tambah/hapus | Tinggi (penguasaan state) | Sulit (perlu manajemen keranjang) | Tinggi (simulasi transaksi) |
+
+> **Catatan:** Karena modul hanya sampai pertemuan 13, semua data bersifat statis (tidak tersimpan permanen). Namun aplikasi sudah **siap untuk diintegrasikan dengan API** (materi Mobile Programming II nanti).
+
+---
+
+### E. Rancangan Struktur Folder & File (Contoh)
+
+```
+lib/
+├── main.dart
+├── pages/
+│   ├── welcome/
+│   │   ├── welcome_page.dart
+│   │   ├── tombol_registrasi.dart
+│   │   └── tombol_login.dart
+│   ├── registrasi/
+│   │   ├── registrasi_page.dart
+│   │   └── submit_registrasi.dart
+│   ├── login/
+│   │   ├── login_page.dart
+│   │   └── submit_login.dart
+│   ├── main_page.dart (BottomNavigationBar)
+│   ├── beranda/
+│   │   ├── beranda_page.dart
+│   │   ├── paket_list.dart (data)
+│   │   ├── paket_card.dart
+│   │   └── search_field.dart
+│   ├── layanan/
+│   │   ├── layanan_page.dart
+│   │   ├── layanan_list.dart
+│   │   ├── layanan_card.dart
+│   │   └── detail_layanan.dart
+│   ├── produk/
+│   │   ├── produk_page.dart
+│   │   ├── produk_list.dart
+│   │   ├── produk_card.dart
+│   │   └── detail_produk.dart
+│   └── booking/
+│       ├── booking_form.dart
+│       └── booking_summary.dart
+├── widgets/
+│   ├── tombol_pesan.dart (reusable)
+│   └── custom_appbar.dart (opsional)
+└── assets/
+    └── img/ (semua gambar)
+```
+
+---
+
+### F. Kelebihan & Relatibilitas Tema "Barber Flow"
+
+- **Target pasar jelas:** Pria usia 17–45 tahun yang peduli penampilan.
+- **Konsep "spa untuk pria"** masih jarang, sehingga aplikasi ini bisa menjadi nilai jual tugas akhir.
+- **Mudah dikembangkan** ke depannya (tambah fitur loyalty point, review, notifikasi).
+- **Semua materi modul terwakili** – dosen akan melihat bahwa Anda benar-benar menguasai Flutter dasar.
+
+---
+
+### G. Contoh Skenario Pengguna (User Journey)
+
+1. Pelanggan membuka **Barber Flow** → melihat halaman *Welcome*.
+2. Klik **Registrasi** (simulasi) → mengisi nama, email, password.
+3. Login → masuk ke **Main Page** dengan 3 menu (Beranda, Layanan, Produk).
+4. Di **Beranda** melihat 3 paket unggulan: *Royal Men's Spa*, *Executive Grooming*, *Hair & Beard Treatment*.
+5. Klik salah satu paket → masuk ke halaman detail (harga, durasi, deskripsi).
+6. Klik tombol **"Pesan Sekarang"** → isi form booking (nama, tanggal, jam, catatan).
+7. Submit → halaman ringkasan pesanan (simulasi).
+8. Kembali ke menu **Layanan** → mencari "facial" menggunakan search field → hasil filter muncul.
+9. Klik layanan "Facial Pria" → lihat detail → pesan lagi.
+
+---
+
+### H. Kesimpulan
+
+Proyek **"Barber Flow"** adalah pilihan ideal untuk memenuhi kriteria **tugas akhir Mobile Programming I** karena:
+- **Meliputi 100% materi** dari pertemuan 1 hingga 13.
+- **Tema modern dan relevan** dengan tren bisnis barbershop & mens grooming.
+- **Mudah dijelaskan** dalam presentasi (ada latar belakang & studi kasus jelas).
+- **Dapat dikerjakan secara kelompok** (maks 5 orang) dengan pembagian: welcome & auth, beranda & pencarian, layanan, produk, form booking.
+
+**Saran tambahan:** Buat video demo aplikasi dengan durasi 3–5 menit, tunjukkan fitur pencarian, navigasi, dan form booking. Upload ke YouTube (unlisted/ publik) seperti contoh di modul.
+
+Selamat mengerjakan! Jika butuh kode contoh untuk salah satu halaman (misal `layanan_page.dart` dengan filter), silakan minta.
