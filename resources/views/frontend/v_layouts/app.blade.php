@@ -27,6 +27,15 @@
     <i class="bi bi-truck"></i> Konsultasi grooming <strong>GRATIS</strong> &amp; pengiriman produk se-Jabodetabek — <strong>Tampil rapi tiap hari.</strong>
 </div>
 
+@php
+    $cartCount = 0;
+    if (session('customer')) {
+        $cartCount = (int) \App\Models\OrderItem::whereHas('order', function ($q) {
+            $q->where('customer_id', session('customer')->id)->where('status', 'pending');
+        })->sum('qty');
+    }
+@endphp
+
 {{-- ===== NAVBAR ===== --}}
 <header class="st-nav">
     <div class="st-container st-nav__inner">
@@ -43,7 +52,16 @@
 
         <div class="st-nav__actions">
             @if (session('customer'))
-                <a class="st-nav__icon" href="{{ route('booking.cart') }}" title="Keranjang Booking"><i class="bi bi-bag"></i></a>
+                <div class="st-cart" id="cartWrap">
+                    <a class="st-nav__icon" id="cartIcon" href="{{ route('booking.cart') }}" title="Keranjang">
+                        <i class="bi bi-bag"></i>
+                        <span class="st-cart__badge {{ $cartCount ? '' : 'is-empty' }}" id="cartBadge">{{ $cartCount }}</span>
+                    </a>
+                    <div class="st-cart__pop" id="cartPop">
+                        <div class="st-cart__pop-row"><i class="bi bi-bag-check" style="color:var(--c-primary)"></i> <strong><span id="cartPopCount">{{ $cartCount }}</span> item</strong> di keranjang</div>
+                        <a href="{{ route('booking.cart') }}" class="btn btn--primary btn--sm btn--block" style="margin-top:.6rem">Lihat Keranjang</a>
+                    </div>
+                </div>
                 <a class="st-nav__icon" href="{{ route('customer.akun') }}" title="Akun Saya"><i class="bi bi-person"></i></a>
             @else
                 <x-button :href="route('customer.login')" size="sm"><i class="bi bi-person"></i> Login</x-button>
@@ -115,6 +133,78 @@
     document.getElementById('stToggle')?.addEventListener('click', () => {
         document.getElementById('stMenu')?.classList.toggle('is-open');
     });
+
+    // ===== Keranjang: animasi terbang + badge + popup (tanpa redirect) =====
+    window.isCustomer = @json((bool) session('customer'));
+
+    function flyToCart(srcImg, cartIcon) {
+        if (!srcImg || !cartIcon) return;
+        const s = srcImg.getBoundingClientRect();
+        const t = cartIcon.getBoundingClientRect();
+        const fly = srcImg.cloneNode(true);
+        Object.assign(fly.style, {
+            position: 'fixed', left: s.left + 'px', top: s.top + 'px',
+            width: s.width + 'px', height: s.height + 'px', objectFit: 'cover',
+            borderRadius: '14px', zIndex: 9999, pointerEvents: 'none',
+            boxShadow: '0 10px 30px rgba(0,0,0,.3)',
+            transition: 'all .8s cubic-bezier(.5,-0.25,.3,1)'
+        });
+        document.body.appendChild(fly);
+        requestAnimationFrame(() => {
+            fly.style.left = (t.left + t.width / 2 - 14) + 'px';
+            fly.style.top  = (t.top + t.height / 2 - 14) + 'px';
+            fly.style.width = '28px'; fly.style.height = '28px'; fly.style.opacity = '.25';
+        });
+        setTimeout(() => {
+            fly.remove();
+            cartIcon.classList.add('cart-bounce');
+            setTimeout(() => cartIcon.classList.remove('cart-bounce'), 450);
+        }, 820);
+    }
+
+    function updateCartBadge(count) {
+        const badge = document.getElementById('cartBadge');
+        const popCount = document.getElementById('cartPopCount');
+        if (badge) { badge.textContent = count; badge.classList.remove('is-empty'); }
+        if (popCount) popCount.textContent = count;
+    }
+
+    function showCartPopup() {
+        const pop = document.getElementById('cartPop');
+        if (!pop) return;
+        pop.classList.add('is-show');
+        clearTimeout(window._cartPopT);
+        window._cartPopT = setTimeout(() => pop.classList.remove('is-show'), 3200);
+    }
+
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-add-cart');
+        if (!btn) return;
+        if (!window.isCustomer) return; // biarkan navigasi default → login
+        e.preventDefault();
+        if (btn.classList.contains('is-loading')) return;
+        btn.classList.add('is-loading');
+
+        const card = btn.closest('.card');
+        const srcImg = card ? card.querySelector('.card__media img') : null;
+        const cartIcon = document.getElementById('cartIcon');
+
+        fetch(btn.dataset.url, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
+            .then(r => r.json())
+            .then(data => {
+                flyToCart(srcImg, cartIcon);
+                setTimeout(() => { updateCartBadge(data.count); showCartPopup(); }, 700);
+            })
+            .catch(() => { window.location.href = btn.dataset.url; })
+            .finally(() => setTimeout(() => btn.classList.remove('is-loading'), 800));
+    });
+
+    // Tampilkan popup saat hover ikon keranjang
+    const cartWrap = document.getElementById('cartWrap');
+    if (cartWrap) {
+        cartWrap.addEventListener('mouseenter', () => document.getElementById('cartPop')?.classList.add('is-show'));
+        cartWrap.addEventListener('mouseleave', () => document.getElementById('cartPop')?.classList.remove('is-show'));
+    }
 </script>
 @if (session('success'))
 <script>Swal.fire({icon:'success',title:'Berhasil',text:@json(session('success')),timer:2200,showConfirmButton:false});</script>

@@ -63,6 +63,9 @@
                 <h5 class="card-title">Pembayaran</h5>
                 <table class="table table-borderless table-sm">
                     <tr><th width="40%">Metode</th><td>{{ $order->metode_bayar ? ucfirst($order->metode_bayar) : '-' }}</td></tr>
+                    <tr><th>Kanal</th><td>{{ $order->kanal_bayar ?? '-' }}</td></tr>
+                    <tr><th>No. Referensi</th><td><code>{{ $order->no_ref ?? '-' }}</code></td></tr>
+                    <tr><th>Dibayar Pada</th><td>{{ $order->dibayar_pada ? $order->dibayar_pada->format('d/m/Y H:i') : '-' }}</td></tr>
                     <tr><th>Status Bayar</th>
                         <td>
                             @if ($order->status_bayar == 'lunas')
@@ -104,15 +107,18 @@
     <div class="col-md-7">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Layanan Dipesan</h5>
+                <h5 class="card-title">Item Dipesan</h5>
                 <table class="table table-bordered">
                     <thead>
-                        <tr><th>Layanan</th><th>Harga</th><th>Qty</th><th>Subtotal</th></tr>
+                        <tr><th>Item</th><th>Harga</th><th>Qty</th><th>Subtotal</th></tr>
                     </thead>
                     <tbody>
                         @foreach ($order->orderItems as $item)
                         <tr>
-                            <td>{{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }}</td>
+                            <td>
+                                @if ($item->produk_id)<span class="badge badge-dark">Produk</span>@else<span class="badge badge-secondary">Layanan</span>@endif
+                                {{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }}
+                            </td>
                             <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
                             <td>{{ $item->qty }}</td>
                             <td>Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</td>

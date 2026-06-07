@@ -23,7 +23,7 @@
 <!-- Stat ringkas -->
 <div class="row">
     <div class="col-md-3 mb-3">
-        <div class="card text-white" style="background:linear-gradient(135deg,#b8860b,#daa520);">
+        <div class="card text-white" style="background:linear-gradient(135deg,#800020,#a0283c);">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div><h6 class="mb-1 text-white-50">Dikonfirmasi</h6><h3 class="mb-0">{{ $stats['confirmed'] }}</h3></div>
                 <i class="mdi mdi-calendar-clock" style="font-size:38px;opacity:.4;"></i>
@@ -89,6 +89,7 @@
                         <th>Total</th>
                         <th>Status</th>
                         <th>Bayar</th>
+                        <th>Metode</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -128,6 +129,14 @@
                             @endif
                         </td>
                         <td>
+                            @if ($order->kanal_bayar)
+                                <span class="badge badge-pill badge-dark">{{ $order->kanal_bayar }}</span>
+                                @if ($order->no_ref)<br><small class="text-muted">{{ $order->no_ref }}</small>@endif
+                            @else
+                                <small class="text-muted">-</small>
+                            @endif
+                        </td>
+                        <td>
                             <a href="{{ route('backend.order.show', $order->id) }}" class="btn btn-sm btn-info" title="Detail">
                                 <i class="mdi mdi-eye"></i>
                             </a>
@@ -147,7 +156,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-5">
+                        <td colspan="9" class="text-center py-5">
                             <i class="mdi mdi-calendar-blank" style="font-size:48px;color:#ccc;"></i>
                             <p class="mt-2 text-muted">Belum ada pesanan</p>
                         </td>

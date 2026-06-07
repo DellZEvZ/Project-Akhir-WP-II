@@ -39,7 +39,7 @@ class BookingController extends Controller
     }
 
     // Tambah layanan ke keranjang
-    public function add($id)
+    public function add(Request $request, $id)
     {
         $layanan = Layanan::where('status', 'aktif')->findOrFail($id);
         $order   = $this->getCart();
@@ -58,12 +58,11 @@ class BookingController extends Controller
 
         $this->recalcTotal($order);
 
-        return redirect()->route('booking.cart')
-            ->with('success', 'Layanan "' . $layanan->nama_layanan . '" ditambahkan ke keranjang.');
+        return $this->cartResponse($request, $order, $layanan->nama_layanan);
     }
 
     // Tambah produk ke keranjang
-    public function addProduk($id)
+    public function addProduk(Request $request, $id)
     {
         $produk = Produk::where('status', 1)->findOrFail($id);
         $order  = $this->getCart();
@@ -82,8 +81,26 @@ class BookingController extends Controller
 
         $this->recalcTotal($order);
 
+        return $this->cartResponse($request, $order, $produk->nama_produk);
+    }
+
+    /**
+     * Balas AJAX dengan JSON (untuk animasi keranjang) atau redirect biasa
+     * sebagai fallback non-JS.
+     */
+    private function cartResponse(Request $request, Order $order, string $name)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'count'   => (int) $order->orderItems()->sum('qty'),
+                'total'   => 'Rp ' . number_format($order->fresh()->total_harga, 0, ',', '.'),
+                'name'    => $name,
+            ]);
+        }
+
         return redirect()->route('booking.cart')
-            ->with('success', 'Produk "' . $produk->nama_produk . '" ditambahkan ke keranjang.');
+            ->with('success', '"' . $name . '" ditambahkan ke keranjang.');
     }
 
     // Update qty item

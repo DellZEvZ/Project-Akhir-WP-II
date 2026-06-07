@@ -42,7 +42,7 @@
                         <span class="card__price">Rp {{ number_format($l->harga, 0, ',', '.') }}</span>
                         <span class="card__meta"><i class="bi bi-clock"></i> {{ $l->durasi_menit }} menit</span>
                         <x-slot:footer>
-                            <x-button :href="route('booking.add', $l->id)" size="sm" block><i class="bi bi-cart-plus"></i> Masukkan ke Keranjang</x-button>
+                            <x-button :href="route('booking.add', $l->id)" :data-url="route('booking.add', $l->id)" class="js-add-cart" size="sm" block><i class="bi bi-cart-plus"></i> Masukkan ke Keranjang</x-button>
                         </x-slot:footer>
                     </x-card>
                 @empty
@@ -62,7 +62,7 @@
                         <span class="card__meta"><i class="bi bi-box-seam"></i> Stok: {{ $p->stok }}</span>
                         <x-slot:footer>
                             @if ($p->stok > 0)
-                                <x-button :href="route('booking.add.produk', $p->id)" size="sm" block><i class="bi bi-cart-plus"></i> Masukkan ke Keranjang</x-button>
+                                <x-button :href="route('booking.add.produk', $p->id)" :data-url="route('booking.add.produk', $p->id)" class="js-add-cart" size="sm" block><i class="bi bi-cart-plus"></i> Masukkan ke Keranjang</x-button>
                             @else
                                 <x-button variant="outline" size="sm" block disabled>Stok Habis</x-button>
                             @endif
