@@ -118,14 +118,24 @@ class BookingController extends Controller
     }
 
     // Hapus item
-    public function remove($itemId)
+    public function remove(Request $request, $itemId)
     {
         $order = $this->getCart();
         $order->orderItems()->where('id', $itemId)->delete();
 
         $this->recalcTotal($order);
+        $order->refresh();
 
-        return redirect()->route('booking.cart')->with('success', 'Item dihapus dari booking.');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'count'   => (int) $order->orderItems()->sum('qty'),
+                'total'   => 'Rp ' . number_format($order->total_harga, 0, ',', '.'),
+                'empty'   => $order->orderItems()->count() === 0,
+            ]);
+        }
+
+        return redirect()->route('booking.cart')->with('success', 'Item dihapus dari keranjang.');
     }
 
     // Halaman checkout

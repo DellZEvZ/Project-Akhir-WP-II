@@ -65,7 +65,7 @@
 }
 
 /* ---------- 2. BASE / RESET (scoped, ringan) ---------- */
-.st-scope { font-family: var(--font-body); color: var(--c-ink); background: var(--c-bg); line-height: var(--lh-base); }
+.st-scope { font-family: var(--font-body); color: var(--c-ink); background: var(--c-bg); line-height: var(--lh-base); overflow-x: hidden; }
 .st-scope img { max-width: 100%; display: block; }
 .st-scope h1,.st-scope h2,.st-scope h3,.st-scope h4 { font-family: var(--font-display); line-height: var(--lh-tight); letter-spacing: .01em; margin: 0; }
 .st-scope a:not(.btn) { color: inherit; text-decoration: none; }
@@ -299,3 +299,43 @@
 .st-cart__pop-row { font-size:var(--fs-sm); }
 
 .js-add-cart.is-loading { opacity:.7; pointer-events:none; }
+
+/* ---------- 18. CART DROP ANIMATION ---------- */
+.cart-row { transition: transform .4s var(--ease), opacity .4s var(--ease); }
+.cart-row--drop { transform: translateY(40px); opacity: 0; }
+.cart-table-wrap { border-radius: var(--radius-lg); overflow: hidden; }
+
+/* ---------- 19. MOBILE / RESPONSIVE ---------- */
+@media (max-width: 760px) {
+  :root { --nav-h: 60px; }
+  .st-topbar { font-size: 10px; padding: .5em .8em; }
+  .st-section { padding-block: var(--sp-8); }
+  .st-nav__inner { gap: var(--sp-3); }
+  .st-nav__brand { font-size: 1.25rem; }
+  .st-head__title, .st-hero__title { letter-spacing: 0; }
+  .st-hero { min-height: 70vh; }
+  .st-hero__inner { padding-block: var(--sp-8); text-align: left; }
+  .st-hero__cta { gap: var(--sp-3); }
+  .st-hero__cta .btn { flex: 1; }                 /* tombol hero penuh & rata */
+  .pay-card { padding: var(--sp-5); }
+  .st-cart__pop { right: -40px; }                  /* popup tetap di layar */
+}
+
+@media (max-width: 600px) {
+  .cart-table-wrap { overflow-x: auto; }
+  .cart-table-wrap table { min-width: 460px; }     /* tabel keranjang bisa digeser */
+  .st-tabs { gap: var(--sp-2); }
+  .st-tab { padding: .6em 1.1em; font-size: var(--fs-xs); }
+  .pay-tabbtn { padding: .6em .7em; font-size: var(--fs-xs); }
+  .pay-channels { grid-template-columns: 1fr; }
+  .struk { max-width: 100%; }
+}
+
+/* Ponsel: grid satu kolom agar kartu tidak terpotong */
+@media (max-width: 540px) {
+  .st-grid--products, .st-grid--3, .st-grid--2 { grid-template-columns: 1fr; }
+  .card { min-width: 0; }
+  .st-hero__cta .btn { font-size: var(--fs-sm); padding: .8em 1em; }
+  .st-head__title, .st-hero__title { font-size: var(--fs-2xl); }
+  .st-container { padding-inline: var(--sp-4); }
+}

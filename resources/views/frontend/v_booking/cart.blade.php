@@ -14,7 +14,7 @@
             </div>
         @else
         <div class="pay-wrap">
-            <div class="pay-card" style="padding:0;overflow:hidden">
+            <div class="pay-card cart-table-wrap" style="padding:0">
                 <table style="width:100%;border-collapse:collapse">
                     <tbody>
                         @foreach ($order->orderItems as $item)
@@ -25,7 +25,7 @@
                                     ? ($item->produk?->foto ? asset('storage/img-produk/'.$item->produk->foto) : asset('image/img-default.jpg'))
                                     : ($item->layanan?->foto ? asset('storage/img-layanan/'.$item->layanan->foto) : asset('image/img-default.jpg'));
                             @endphp
-                            <tr style="border-bottom:1px solid var(--c-line)">
+                            <tr class="cart-row" id="cart-row-{{ $item->id }}" style="border-bottom:1px solid var(--c-line)">
                                 <td style="padding:var(--sp-4)">
                                     <div style="display:flex;gap:var(--sp-4);align-items:center">
                                         <img src="{{ $foto }}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:var(--radius)">
@@ -49,7 +49,7 @@
                                     <div class="card__price" style="font-size:var(--fs-lg)">Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</div>
                                 </td>
                                 <td style="padding:var(--sp-4);width:50px">
-                                    <form action="{{ route('booking.remove', $item->id) }}" method="POST">
+                                    <form action="{{ route('booking.remove', $item->id) }}" method="POST" class="js-remove-form" data-row="cart-row-{{ $item->id }}">
                                         @csrf
                                         <button class="btn btn--ghost" title="Hapus" style="color:var(--c-danger)"><i class="bi bi-trash"></i></button>
                                     </form>
@@ -62,8 +62,8 @@
 
             <div class="pay-card">
                 <h3 class="card__title" style="margin-bottom:var(--sp-4)">Ringkasan</h3>
-                <div class="pay-summary__row"><span>Jumlah item</span><span>{{ $order->orderItems->sum('qty') }}</span></div>
-                <div class="pay-summary__total"><b>Total</b><b>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</b></div>
+                <div class="pay-summary__row"><span>Jumlah item</span><span id="sumCount">{{ $order->orderItems->sum('qty') }}</span></div>
+                <div class="pay-summary__total"><b>Total</b><b id="sumTotal">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</b></div>
                 <div style="margin-top:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-3)">
                     <x-button :href="route('booking.checkout')" block><i class="bi bi-arrow-right-circle"></i> Lanjut ke Checkout</x-button>
                     <x-button :href="route('front.catalog')" variant="outline" block>Tambah Item</x-button>
@@ -73,4 +73,34 @@
         @endif
     </div>
 </section>
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.js-remove-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const row = document.getElementById(form.dataset.row);
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (row) {
+                    row.classList.add('cart-row--drop');
+                    setTimeout(() => {
+                        row.remove();
+                        const c = document.getElementById('sumCount'); if (c) c.textContent = data.count;
+                        const t = document.getElementById('sumTotal'); if (t) t.textContent = data.total;
+                        if (window.updateCartBadge) window.updateCartBadge(data.count);
+                        if (data.empty) window.location.reload(); // tampilkan state kosong
+                    }, 420);
+                }
+            })
+            .catch(() => form.submit());
+        });
+    });
+</script>
+@endpush
 @endsection
