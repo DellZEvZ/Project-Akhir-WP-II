@@ -43,4 +43,34 @@ class AuthService {
     }
     await ApiService.clearToken();
   }
+
+  /// Ambil profil customer yang sedang login. Null jika gagal.
+  static Future<Map<String, dynamic>?> me() async {
+    try {
+      final res = await ApiService.get('/me', auth: true);
+      return Map<String, dynamic>.from(res['data']);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Perbarui profil. Null jika sukses, atau pesan error.
+  static Future<String?> updateProfile({
+    required String nama,
+    String? noHp,
+    String? alamat,
+  }) async {
+    try {
+      await ApiService.post('/me', {
+        'nama': nama,
+        'no_hp': noHp ?? '',
+        'alamat': alamat ?? '',
+      }, auth: true);
+      return null;
+    } on ApiException catch (e) {
+      return e.message;
+    } catch (_) {
+      return 'Tidak dapat terhubung ke server.';
+    }
+  }
 }

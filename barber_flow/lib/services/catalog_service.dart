@@ -25,4 +25,14 @@ class CatalogService {
       return List<Map<String, dynamic>>.from(produkData);
     }
   }
+
+  static Future<List<Map<String, dynamic>>> fetchGaleri() async {
+    try {
+      final res = await ApiService.get('/galeri');
+      final List list = res['data'];
+      return list.map((e) => Map<String, dynamic>.from(e)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
 }

@@ -21,6 +21,7 @@ Route::post('/login',    [CustomerApiController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [CustomerApiController::class, 'logout']);
     Route::get('/me',      [CustomerApiController::class, 'me']);
+    Route::post('/me',     [CustomerApiController::class, 'update']);
 
     Route::get('/booking',          [BookingApiController::class, 'index']);
     Route::post('/booking',         [BookingApiController::class, 'store']);

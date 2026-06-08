@@ -19,9 +19,14 @@ class BookingService {
   }
 
   /// Mengirim metode pembayaran untuk sebuah booking.
-  static Future<Map<String, dynamic>> payBooking(int orderId, String metode) async {
+  static Future<Map<String, dynamic>> payBooking(
+    int orderId,
+    String metode, {
+    String? kanal,
+  }) async {
     final res = await ApiService.post('/booking/$orderId/pay', {
       'metode_bayar': metode,
+      'kanal_bayar': kanal ?? '',
     }, auth: true);
     return Map<String, dynamic>.from(res['data']);
   }

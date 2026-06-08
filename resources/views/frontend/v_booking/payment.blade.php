@@ -19,32 +19,36 @@
                             </div>
 
                             <div class="pay-pane active" id="pane-transfer">
-                                @foreach ([['BCA','logo-bca','8800 1234 5678'],['BNI','logo-bni','9880 1234 5678'],['Mandiri','logo-mandiri','7000 1234 5678'],['BRI','logo-bri','0023 1234 5678']] as $b)
+                                @foreach ([['BCA','bca','8800 1234 5678'],['BNI','bni','9880 1234 5678'],['Mandiri','mandiri','7000 1234 5678'],['BRI','bri','0023 1234 5678']] as $b)
                                     <label class="pay-ch">
                                         <input type="radio" name="kanal_bayar" value="{{ $b[0] }}" data-group="transfer" @if($loop->first) checked @endif>
-                                        <span class="pay-logo {{ $b[1] }}">{{ $b[0] }}</span>
+                                        <span class="pay-logo logo-{{ $b[1] }}" id="lg-{{ $b[1] }}">{{ $b[0] }}</span>
+                                        <img class="pay-logo-img" src="{{ asset('image/icon/'.$b[1].'.png') }}" alt="{{ $b[0] }}"
+                                             onload="document.getElementById('lg-{{ $b[1] }}').style.display='none'" onerror="this.style.display='none'">
                                         <span><strong>Bank {{ $b[0] }}</strong><br><small class="text-muted">VA {{ $b[2] }}</small></span>
                                     </label>
                                 @endforeach
-                                <div class="alert alert-secondary small mb-0"><i class="bi bi-info-circle"></i> Transfer ke Virtual Account di atas. <strong>Simulasi:</strong> klik "Bayar Sekarang" untuk menandai lunas otomatis.</div>
+                                <div class="alert alert-secondary small mb-0"><i class="bi bi-info-circle"></i> Pilih bank, lalu lanjut ke gateway pembayaran mitra (simulasi).</div>
                             </div>
 
                             <div class="pay-pane" id="pane-ewallet">
-                                @foreach ([['OVO','logo-ovo'],['DANA','logo-dana'],['GoPay','logo-gopay'],['ShopeePay','logo-shopee']] as $w)
+                                @foreach ([['OVO','ovo'],['DANA','dana'],['GoPay','gopay'],['ShopeePay','shopeepay']] as $w)
                                     <label class="pay-ch">
                                         <input type="radio" name="kanal_bayar" value="{{ $w[0] }}" data-group="ewallet">
-                                        <span class="pay-logo {{ $w[1] }}">{{ Str::limit($w[0],4,'') }}</span>
+                                        <span class="pay-logo logo-{{ $w[1] }}" id="lg-{{ $w[1] }}">{{ Str::limit($w[0],4,'') }}</span>
+                                        <img class="pay-logo-img" src="{{ asset('image/icon/'.$w[1].'.png') }}" alt="{{ $w[0] }}"
+                                             onload="document.getElementById('lg-{{ $w[1] }}').style.display='none'" onerror="this.style.display='none'">
                                         <span><strong>{{ $w[0] }}</strong><br><small class="text-muted">0812-3456-7890</small></span>
                                     </label>
                                 @endforeach
-                                <div class="alert alert-secondary small mb-0"><i class="bi bi-phone"></i> Bayar via e-wallet ke nomor terdaftar. <strong>Simulasi</strong> berhasil seketika.</div>
+                                <div class="alert alert-secondary small mb-0"><i class="bi bi-phone"></i> Pilih e-wallet, lalu lanjut ke gateway pembayaran mitra (simulasi).</div>
                             </div>
 
                             <div class="pay-pane" id="pane-cash">
                                 <div class="alert alert-info small mb-0"><i class="bi bi-shop"></i> Pembayaran tunai dilakukan langsung saat kedatangan (layanan) atau penerimaan (produk). Pesanan tetap dikonfirmasi.</div>
                             </div>
 
-                            <button type="submit" class="btn btn-gold btn-lg w-100 mt-4"><i class="bi bi-shield-check"></i> Bayar Sekarang</button>
+                            <button type="submit" class="btn btn-gold btn-lg w-100 mt-4"><i class="bi bi-arrow-right-circle"></i> Lanjut ke Pembayaran</button>
                         </div>
                     </div>
                 </div>

@@ -125,8 +125,9 @@
         .pay-ch input { position:absolute; opacity:0; }
         .pay-ch:has(input:checked) { border-color:var(--bf-gold); box-shadow:0 0 0 3px rgba(128,0,32,.08); }
         .pay-ch:has(input:checked)::after { content:'\2713'; position:absolute; right:14px; color:var(--bf-gold); font-weight:800; }
-        .pay-logo { width:46px; height:32px; display:flex; align-items:center; justify-content:center;
-            border-radius:6px; font-weight:800; font-size:11px; color:#fff; }
+        .pay-logo { width:54px; height:34px; display:flex; align-items:center; justify-content:center;
+            border-radius:6px; font-weight:800; font-size:11px; color:#fff; flex:0 0 auto; }
+        .pay-logo-img { width:54px; height:34px; object-fit:contain; flex:0 0 auto; background:#fff; border-radius:6px; }
         .logo-ovo{background:#4c2a86}.logo-dana{background:#118eea}.logo-gopay{background:#00aa13}.logo-shopee{background:#ee4d2d}
         .logo-bca{background:#0060af}.logo-bni{background:#ec6726}.logo-mandiri{background:#003d79}.logo-bri{background:#00529c}
 

@@ -78,16 +78,35 @@ class CustomerApiController extends Controller
 
     public function me(Request $request)
     {
+        return response()->json(['success' => true, 'data' => $this->profile($request->user())]);
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'nama'   => 'required|string|max:255',
+            'no_hp'  => 'nullable|string|max:30',
+            'alamat' => 'nullable|string|max:500',
+        ]);
+
         $c = $request->user();
+        $c->update($request->only('nama', 'no_hp', 'alamat'));
+
         return response()->json([
             'success' => true,
-            'data'    => [
-                'id'     => $c->id,
-                'nama'   => $c->nama,
-                'email'  => $c->email,
-                'no_hp'  => $c->no_hp,
-                'alamat' => $c->alamat,
-            ],
+            'data'    => $this->profile($c->fresh()),
+            'message' => 'Profil diperbarui',
         ]);
+    }
+
+    private function profile(Customer $c): array
+    {
+        return [
+            'id'     => $c->id,
+            'nama'   => $c->nama,
+            'email'  => $c->email,
+            'no_hp'  => $c->no_hp,
+            'alamat' => $c->alamat,
+        ];
     }
 }

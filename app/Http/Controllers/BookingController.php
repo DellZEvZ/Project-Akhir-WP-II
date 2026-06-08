@@ -227,14 +227,41 @@ class BookingController extends Controller
                 ->with('success', 'Pesanan dikonfirmasi. Pembayaran tunai dilakukan saat kedatangan/penerimaan.');
         }
 
-        // Simulasi pembayaran berhasil seketika.
+        // Transfer / e-wallet → simpan pilihan, lalu menuju gateway mitra (simulasi).
         $order->update([
             'metode_bayar' => $request->metode_bayar,
             'kanal_bayar'  => $request->kanal_bayar,
-            'status_bayar' => 'lunas',
-            'no_ref'       => 'BF-' . now()->format('ymdHis') . '-' . strtoupper(Str::random(4)),
-            'dibayar_pada' => now(),
+            'status_bayar' => 'belum',
         ]);
+
+        return redirect()->route('booking.gateway', $order->id);
+    }
+
+    // Halaman gateway mitra (simulasi pembayaran pihak ketiga)
+    public function gateway($id)
+    {
+        $order = $this->ownedOrder($id);
+
+        // Hanya valid bila metode online sudah dipilih & belum lunas.
+        if ($order->status_bayar === 'lunas' || ! $order->metode_bayar || $order->metode_bayar === 'cash') {
+            return redirect()->route('booking.payment', $order->id);
+        }
+
+        return view('frontend.v_booking.gateway', compact('order'));
+    }
+
+    // Konfirmasi pembayaran dari gateway → tandai lunas + buat struk
+    public function payConfirm($id)
+    {
+        $order = $this->ownedOrder($id);
+
+        if ($order->status_bayar !== 'lunas') {
+            $order->update([
+                'status_bayar' => 'lunas',
+                'no_ref'       => 'BF-' . now()->format('ymdHis') . '-' . strtoupper(Str::random(4)),
+                'dibayar_pada' => now(),
+            ]);
+        }
 
         return redirect()->route('booking.struk', $order->id)
             ->with('success', 'Pembayaran berhasil! Berikut struk pembayaran Anda.');

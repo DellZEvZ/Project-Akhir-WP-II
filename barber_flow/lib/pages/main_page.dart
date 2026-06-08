@@ -3,8 +3,10 @@ import '../theme.dart';
 import 'beranda_page.dart';
 import 'layanan_page.dart';
 import 'produk_page.dart';
+import 'galeri_page.dart';
+import 'akun_page.dart';
 
-/// Halaman utama dengan BottomNavigationBar (Beranda, Layanan, Produk).
+/// Halaman utama dengan BottomNavigationBar.
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -19,12 +21,14 @@ class _MainPageState extends State<MainPage> {
     BerandaPage(),
     LayananPage(),
     ProdukPage(),
+    GaleriPage(),
+    AkunPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
@@ -36,6 +40,8 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(icon: Icon(Icons.content_cut), label: 'Layanan'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Produk'),
+          BottomNavigationBarItem(icon: Icon(Icons.photo_library), label: 'Galeri'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Akun'),
         ],
       ),
     );

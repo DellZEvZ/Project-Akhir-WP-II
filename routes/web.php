@@ -60,6 +60,10 @@ Route::middleware('is.customer')->group(function () {
     Route::get('/pembayaran/{id}', [BookingController::class, 'payment'])->name('booking.payment');
     Route::post('/pembayaran/{id}', [BookingController::class, 'pay'])->name('booking.pay');
 
+    // Gateway mitra (simulasi) → konfirmasi → lunas
+    Route::get('/pembayaran/{id}/gateway', [BookingController::class, 'gateway'])->name('booking.gateway');
+    Route::post('/pembayaran/{id}/konfirmasi', [BookingController::class, 'payConfirm'])->name('booking.pay.confirm');
+
     // Struk / bukti pembayaran
     Route::get('/struk/{id}', [BookingController::class, 'struk'])->name('booking.struk');
 

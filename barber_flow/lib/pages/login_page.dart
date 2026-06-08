@@ -35,9 +35,12 @@ class _LoginPageState extends State<LoginPage> {
 
     // Sukses (error == null) atau server tidak terjangkau -> lanjut (mode demo).
     if (error == null || error.contains('terhubung')) {
-      Navigator.pushReplacement(
+      // Jadikan MainPage sebagai root agar tidak "terlempar" ke Welcome
+      // setelah aksi seperti booking (popUntil isFirst).
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const MainPage()),
+        (route) => false,
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

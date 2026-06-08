@@ -36,6 +36,9 @@ class ApiService {
 
   static Uri _uri(String path) => Uri.parse('${AppConfig.baseUrl}$path');
 
+  /// Host server tanpa '/api', untuk memuat aset (mis. logo pembayaran).
+  static String get host => AppConfig.baseUrl.replaceAll('/api', '');
+
   static Future<dynamic> get(String path, {bool auth = false}) async {
     final res = await http
         .get(_uri(path), headers: await _headers(auth: auth))

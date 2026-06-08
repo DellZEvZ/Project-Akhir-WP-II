@@ -76,6 +76,7 @@ class BookingApiController extends Controller
     {
         $request->validate([
             'metode_bayar' => 'required|in:transfer,cash,ewallet',
+            'kanal_bayar'  => 'nullable|string|max:50',
         ]);
 
         $order = Order::where('customer_id', $request->user()->id)->find($id);
@@ -83,19 +84,32 @@ class BookingApiController extends Controller
             return response()->json(['success' => false, 'message' => 'Booking tidak ditemukan'], 404);
         }
 
-        // Cash → bayar di tempat; transfer/ewallet → menunggu verifikasi admin.
-        $statusBayar = $request->metode_bayar === 'cash' ? 'belum' : 'menunggu_verifikasi';
-
-        $order->update([
-            'metode_bayar' => $request->metode_bayar,
-            'status_bayar' => $statusBayar,
-        ]);
+        if ($request->metode_bayar === 'cash') {
+            // Bayar di tempat.
+            $order->update([
+                'metode_bayar' => 'cash',
+                'kanal_bayar'  => 'Bayar di Tempat',
+                'status_bayar' => 'belum',
+            ]);
+        } else {
+            // Simulasi gateway berhasil → langsung lunas + nomor referensi (struk).
+            $order->update([
+                'metode_bayar' => $request->metode_bayar,
+                'kanal_bayar'  => $request->kanal_bayar,
+                'status_bayar' => 'lunas',
+                'no_ref'       => 'BF-' . now()->format('ymdHis') . '-' . strtoupper(\Illuminate\Support\Str::random(4)),
+                'dibayar_pada' => now(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,
             'data'    => [
                 'id'                 => $order->id,
                 'metode_bayar'       => $order->metode_bayar,
+                'kanal_bayar'        => $order->kanal_bayar,
+                'no_ref'             => $order->no_ref,
+                'total_harga'        => (int) $order->total_harga,
                 'status_bayar'       => $order->status_bayar,
                 'status_bayar_label' => $order->status_bayar_label,
             ],
