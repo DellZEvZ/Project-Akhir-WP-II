@@ -34,19 +34,25 @@
 | `main.dart` | Entry point → `MaterialApp`, tema, halaman awal `WelcomePage` |
 | `theme.dart` | `AppColors` (palet dark + gold), `buildAppTheme()` |
 | `config/app_config.dart` | `baseUrl` API + timeout |
-| `pages/` | Layar: welcome, login, registrasi, beranda, layanan & detail, produk & detail, booking form/summary, payment, main |
-| `services/` | `ApiService` (HTTP dasar + token), `AuthService`, `CatalogService`, `BookingService` |
-| `widgets/` | Komponen reusable: `katalog_card`, `foto`, `tombol_pesan` |
+| `pages/` | Layar: welcome, login, registrasi, beranda, layanan & detail, produk & detail, booking form/summary, **payment, gateway, struk, riwayat, akun, galeri**, main |
+| `services/` | `ApiService` (HTTP dasar + token + `host` untuk aset), `AuthService` (login/register/logout/**me/update**), `CatalogService` (+**galeri**), `BookingService` (+**fetchOrders**, pay berkanal) |
+| `widgets/` | Komponen reusable: `katalog_card`, `foto` (aman terhadap `null`), `tombol_pesan` |
 | `data/` | Data katalog statis (fallback bila API tak tersedia) |
 
 ### 5. Alur Aplikasi
 
 ```
-WelcomePage → Login / Registrasi → MainPage (BottomNavigationBar)
+WelcomePage → Login / Registrasi → MainPage (BottomNavigationBar, 5 tab)
    ├── BerandaPage  (paket unggulan – GridView)
-   ├── LayananPage  (list + pencarian real-time → DetailLayanan → BookingForm → Payment)
-   └── ProdukPage   (list + pencarian → DetailProduk)
+   ├── LayananPage  (list + cari → DetailLayanan → BookingForm → Payment)
+   ├── ProdukPage   (list + cari → DetailProduk)
+   ├── GaleriPage   (grid dari API /galeri)
+   └── AkunPage     (profil + edit, logout, → RiwayatPage → StrukPage)
+
+Pembayaran: Payment (pilih metode + kanal berlogo) → GatewayPage (simulasi mitra) → lunas → Struk
 ```
+
+> Login memakai `Navigator.pushAndRemoveUntil` agar `MainPage` menjadi root — memperbaiki bug "terlempar ke Welcome" setelah selesai booking.
 
 ### 6. Penerapan Konsep Perkuliahan
 
@@ -57,14 +63,17 @@ WelcomePage → Login / Registrasi → MainPage (BottomNavigationBar)
 | 5 / 9 | Form & validasi | Form registrasi & booking, `GlobalKey<FormState>`, `TextFormField` |
 | 6 | Navigasi | `Navigator.push/pop` ke halaman detail & booking |
 | 10 | Login + SharedPreferences | Token Bearer disimpan via `shared_preferences` (key `auth_token`) |
-| 11 | Bottom Navigation Bar | `MainPage` dengan 3 tab (Beranda, Layanan, Produk) |
+| 11 | Bottom Navigation Bar | `MainPage` dengan **5 tab** (Beranda, Layanan, Produk, Galeri, Akun) via `IndexedStack` |
 | 12 | Halaman beranda | `GridView`, `ListView`, `Card`, pencarian real-time |
+| 13–15 | Bimbingan project akhir | Manajemen akun (profil/edit/logout), **riwayat pesanan + struk**, **gateway pembayaran berlogo** — paritas dengan versi web |
 
 ### 7. Integrasi API
 
-Semua request melewati `ApiService` (metode statis `get`/`post`): menambah header `Accept`/`Content-Type`, menyisipkan `Authorization: Bearer <token>` bila perlu, dan melempar `ApiException` saat status non-2xx. `AuthService` memanggil `/register` & `/login`, lalu menyimpan `data.token`. Endpoint publik: `/layanan`, `/produk`, `/barber`, `/galeri`; endpoint terproteksi (Sanctum): `/me`, `/logout`, `/booking`, `/booking/{id}/pay`.
+Semua request melewati `ApiService` (metode statis `get`/`post`): menambah header `Accept`/`Content-Type`, menyisipkan `Authorization: Bearer <token>` bila perlu, dan melempar `ApiException` saat status non-2xx. `AuthService` memanggil `/register` & `/login`, lalu menyimpan `data.token`. Endpoint publik: `/layanan`, `/produk`, `/barber`, `/galeri`; endpoint terproteksi (Sanctum): `GET/POST /me` (lihat & **update profil**), `/logout`, `GET /booking` (riwayat lengkap: status, no_ref, kanal, item produk+layanan), `POST /booking/{id}/pay` (simulasi → **lunas** + no. referensi).
 
-> Konfigurasi `baseUrl` di `lib/config/app_config.dart` — default emulator Android `http://10.0.2.2:8000/api`.
+Logo pembayaran dimuat dari server yang sama (`${ApiService.host}/image/icon/<kanal>.png`) dengan *fallback* teks, sehingga **logo yang sama dipakai web & mobile**.
+
+> Konfigurasi `baseUrl` di `lib/config/app_config.dart`. Untuk **HP fisik via USB** dipakai `http://localhost:8000/api` + perintah `adb reverse tcp:8000 tcp:8000` (jembatan port HP→PC); untuk emulator Android `http://10.0.2.2:8000/api`.
 
 ### 8. Pengujian
 

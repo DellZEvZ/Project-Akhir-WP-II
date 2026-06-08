@@ -54,8 +54,8 @@ Request → Route (web.php) → Middleware (auth / is.customer / permission)
 | `Produk` | produk | nama_produk, detail, harga, stok, berat, foto, status | belongsTo `Kategori`, hasMany `FotoProduk` |
 | `Galeri` | galeris | judul, foto, keterangan, tipe (haircut/hairstyle) | — |
 | `Customer` | customers | nama, email, password, no_hp, alamat, foto, google_id | hasMany `Order` |
-| `Order` | orders | customer_id, total_harga, status, tanggal_booking, jam_booking, catatan | belongsTo `Customer`, hasMany `OrderItem` |
-| `OrderItem` | order_items | order_id, layanan_id, qty, harga | belongsTo `Order`, `Layanan` |
+| `Order` | orders | customer_id, total_harga, status, jenis, tanggal_booking, jam_booking, alamat_kirim, metode_bayar, kanal_bayar, status_bayar, no_ref, dibayar_pada, catatan | belongsTo `Customer`, hasMany `OrderItem` |
+| `OrderItem` | order_items | order_id, layanan_id, produk_id, qty, harga | belongsTo `Order`, `Layanan`, `Produk` |
 
 ### 6. Fitur yang Diimplementasikan
 
@@ -67,9 +67,12 @@ Request → Route (web.php) → Middleware (auth / is.customer / permission)
 
 **Frontend (Pelanggan):**
 - Beranda dengan hero slideshow, layanan unggulan, tim barber, galeri, produk.
-- Daftar & detail Layanan (dengan pencarian), Produk, Galeri (filter tipe), Tim Barber.
+- **Katalog gabungan** (Layanan + Produk dalam satu halaman bertab) dengan pencarian.
 - Autentikasi pelanggan (registrasi/login, termasuk Google OAuth via `google_id`).
-- Keranjang/booking layanan, checkout, pembayaran, riwayat order.
+- **Keranjang campuran** (layanan + produk) dengan tombol "Masukkan ke Keranjang" **beranimasi** (item terbang ke ikon keranjang) + badge jumlah; **hapus item** dengan animasi *drop* (AJAX, tanpa reload).
+- **Checkout kondisional**: jadwal kunjungan untuk layanan, alamat pengiriman untuk produk.
+- **Pembayaran simulasi**: pilih metode (Transfer Bank / E-Wallet / Bayar di Tempat) berkanal **berlogo** (BCA, BNI, Mandiri, BRI, OVO, DANA, GoPay, ShopeePay) → diarahkan ke **halaman gateway mitra (simulasi)** (nomor VA / e-wallet, hitung mundur) → konfirmasi → **lunas + struk**.
+- **Struk / bukti pembayaran** (No. Referensi, dapat dicetak) + **riwayat pesanan** di halaman Akun dengan tombol "Lihat Struk".
 
 ### 7. Materi Mata Kuliah yang Diterapkan
 
@@ -84,9 +87,18 @@ Request → Route (web.php) → Middleware (auth / is.customer / permission)
 | 9–11 | Payment gateway & order management | Status order, halaman checkout/payment, panel admin order |
 | 12 | Dashboard & laporan | Dashboard admin + Activity Log |
 
-### 8. Pembaruan Tampilan (Iterasi Terakhir)
+### 8. Dua Versi Tampilan (Iterasi Terakhir)
 
-Storefront direstyle menggunakan foto asli barbershop: hero diganti dari gambar eksternal menjadi **slideshow crossfade 5 gambar (CSS murni)**, ditambah latar bergambar pada bagian Layanan/Galeri/Produk dan banner header bergambar pada halaman daftar, semua dengan overlay gelap agar teks tetap terbaca.
+Storefront dikembangkan dalam **dua versi tema** yang dapat dibandingkan (dikelola dengan Git branch):
+
+| Versi | Branch | Ciri |
+|---|---|---|
+| **Original** | `main` | Tema Bootstrap navbar gelap + aksen maroon/gold, hero slideshow crossfade 5 gambar, latar bergambar tiap section. |
+| **Remake (Supreme-Trimmer)** | `redesign-supremetrimmer` | Mini design system (CSS variabel: warna, tipografi, spacing, radius, shadow), tema putih bersih ala e-commerce, komponen Blade reusable (`x-button`, `x-card`, `x-input`), hero auto-slideshow. |
+
+Kedua versi memiliki fitur fungsional sama (katalog gabungan, keranjang, gateway pembayaran + logo, struk). Tag `original-baseline` menyimpan tampilan awal sebelum semua fitur ini.
+
+**Simulasi gateway pembayaran:** alur `payment → pay() (simpan metode/kanal) → halaman gateway mitra → konfirmasi → lunas + no. referensi + struk`. Logo brand dimuat dari `public/image/icon/` dengan *fallback* chip warna bila file belum ada.
 
 ### 9. Kesimpulan
 
