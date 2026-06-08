@@ -292,8 +292,15 @@
         const cartIcon = document.getElementById('cartIcon');
         fetch(btn.dataset.url, { headers: { 'X-Requested-With':'XMLHttpRequest', 'Accept':'application/json' } })
             .then(r => r.json())
-            .then(data => { flyToCart(srcImg, cartIcon);
-                setTimeout(() => { updateCartBadge(data.count); showCartPopup(); }, 700); })
+            .then(data => {
+                if (data.success === false) {
+                    if (window.Swal) Swal.fire({ icon:'warning', title:'Tidak bisa dicampur', text:data.message });
+                    else alert(data.message);
+                    return;
+                }
+                flyToCart(srcImg, cartIcon);
+                setTimeout(() => { updateCartBadge(data.count); showCartPopup(); }, 700);
+            })
             .catch(() => { window.location.href = btn.dataset.url; })
             .finally(() => setTimeout(() => btn.classList.remove('disabled'), 800));
     });

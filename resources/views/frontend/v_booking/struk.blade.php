@@ -41,6 +41,13 @@
                 <div class="struk-row mt-2"><span>Kirim ke</span><span style="text-align:right;max-width:60%;">{{ $order->alamat_kirim }}</span></div>
             @endif
 
+            @if ($order->status_bayar === 'lunas')
+                <div class="text-center mt-3 pt-3" style="border-top:2px dashed #e0e0e0;">
+                    <div id="qrcode" style="display:inline-block"></div>
+                    <div class="text-muted small mt-2">Scan QR ini di kasir untuk verifikasi pembayaran</div>
+                </div>
+            @endif
+
             <p class="text-center text-muted small mt-3 mb-0" style="border-top:2px dashed #e0e0e0;padding-top:14px;">
                 Terima kasih telah mempercayai Barber Flow.<br>Tunjukkan struk ini sebagai bukti pembayaran.
             </p>
@@ -52,4 +59,21 @@
         </div>
     </div>
 </section>
+
+@if ($order->status_bayar === 'lunas')
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+<script>
+    (function () {
+        const el = document.getElementById('qrcode');
+        if (!el || typeof QRCode === 'undefined') return;
+        new QRCode(el, {
+            text: @json('BARBERFLOW|order:'.$order->id.'|ref:'.($order->no_ref ?? '-').'|total:'.$order->total_harga),
+            width: 150, height: 150, colorDark: '#161616', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    })();
+</script>
+@endpush
+@endif
 @endsection

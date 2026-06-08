@@ -44,6 +44,11 @@ class BookingController extends Controller
         $layanan = Layanan::where('status', 'aktif')->findOrFail($id);
         $order   = $this->getCart();
 
+        // Satu order tidak boleh campur: tolak layanan bila keranjang berisi produk.
+        if ($order->orderItems()->whereNotNull('produk_id')->exists()) {
+            return $this->mixError($request, $order, 'produk');
+        }
+
         $item = $order->orderItems()->where('layanan_id', $layanan->id)->first();
 
         if ($item) {
@@ -66,6 +71,11 @@ class BookingController extends Controller
     {
         $produk = Produk::where('status', 1)->findOrFail($id);
         $order  = $this->getCart();
+
+        // Satu order tidak boleh campur: tolak produk bila keranjang berisi layanan.
+        if ($order->orderItems()->whereNotNull('layanan_id')->exists()) {
+            return $this->mixError($request, $order, 'layanan');
+        }
 
         $item = $order->orderItems()->where('produk_id', $produk->id)->first();
 
@@ -101,6 +111,24 @@ class BookingController extends Controller
 
         return redirect()->route('booking.cart')
             ->with('success', '"' . $name . '" ditambahkan ke keranjang.');
+    }
+
+    /** Tolak pencampuran layanan & produk dalam satu order. */
+    private function mixError(Request $request, Order $order, string $existing)
+    {
+        $msg = $existing === 'produk'
+            ? 'Keranjang berisi PRODUK. Selesaikan atau kosongkan dulu untuk booking layanan.'
+            : 'Keranjang berisi LAYANAN. Selesaikan atau kosongkan dulu untuk belanja produk.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $msg,
+                'count'   => (int) $order->orderItems()->sum('qty'),
+            ], 409);
+        }
+
+        return redirect()->route('booking.cart')->with('error', $msg);
     }
 
     // Update qty item
