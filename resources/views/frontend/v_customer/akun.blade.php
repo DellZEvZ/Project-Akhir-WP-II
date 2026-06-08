@@ -19,7 +19,11 @@
                             </div>
                         @endif
                         <h5 class="font-head mb-0">{{ $customer->nama }}</h5>
-                        <p class="text-muted small">{{ $customer->email }}</p>
+                        <p class="text-muted small mb-3">{{ $customer->email }}</p>
+                        <form action="{{ route('customer.logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-box-arrow-right"></i> Keluar / Logout</button>
+                        </form>
                     </div>
                 </div>
             </div>
