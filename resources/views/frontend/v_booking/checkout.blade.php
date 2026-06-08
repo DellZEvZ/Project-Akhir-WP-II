@@ -2,47 +2,63 @@
 @section('title', 'Checkout')
 
 @section('content')
-<section class="st-section" style="background:var(--c-surface);min-height:70vh">
-    <div class="st-container">
-        <h1 class="st-head__title" style="margin-bottom:var(--sp-6)">Checkout</h1>
-
+<section class="py-5" style="background:#f4f4f4;min-height:70vh;">
+    <div class="container">
+        <h3 class="font-head mb-4">CHECKOUT</h3>
         <form action="{{ route('booking.confirm') }}" method="POST">
             @csrf
-            <div class="pay-wrap">
-                <div class="pay-card">
-                    @if ($order->has_layanan)
-                        <h3 class="card__title" style="margin-bottom:var(--sp-4)"><i class="bi bi-calendar-check"></i> Jadwal Kunjungan</h3>
-                        <div class="st-grid st-grid--2" style="gap:var(--sp-4)">
-                            <x-input type="date" name="tanggal_booking" label="Tanggal" :value="old('tanggal_booking')" min="{{ date('Y-m-d') }}" required />
-                            <x-input type="time" name="jam_booking" label="Jam (09.00–21.00)" :value="old('jam_booking')" min="09:00" max="21:00" required />
-                        </div>
-                        @error('tanggal_booking')<small style="color:var(--c-danger)">{{ $message }}</small>@enderror
-                    @endif
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <div class="card card-bf">
+                        <div class="card-body p-4">
+                            @if ($order->has_layanan)
+                                <h5 class="font-head mb-3"><i class="bi bi-calendar-check text-gold"></i> Jadwal Kunjungan</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">Tanggal <span class="text-danger">*</span></label>
+                                        <input type="date" name="tanggal_booking" class="form-control @error('tanggal_booking') is-invalid @enderror"
+                                               min="{{ date('Y-m-d') }}" value="{{ old('tanggal_booking') }}" required>
+                                        @error('tanggal_booking')<small class="text-danger">{{ $message }}</small>@enderror
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">Jam (09.00–21.00) <span class="text-danger">*</span></label>
+                                        <input type="time" name="jam_booking" class="form-control" min="09:00" max="21:00" value="{{ old('jam_booking') }}" required>
+                                    </div>
+                                </div>
+                            @endif
 
-                    @if ($order->has_produk)
-                        <div class="field" style="margin-top:var(--sp-5)">
-                            <label class="field__label">Alamat Pengiriman</label>
-                            <textarea name="alamat_kirim" class="input" rows="3" placeholder="Alamat lengkap penerima" required>{{ old('alamat_kirim') }}</textarea>
-                            @error('alamat_kirim')<small style="color:var(--c-danger)">{{ $message }}</small>@enderror
-                        </div>
-                    @endif
+                            @if ($order->has_produk)
+                                <h5 class="font-head mb-3 {{ $order->has_layanan ? 'mt-2' : '' }}"><i class="bi bi-truck text-gold"></i> Alamat Pengiriman</h5>
+                                <div class="mb-3">
+                                    <textarea name="alamat_kirim" class="form-control @error('alamat_kirim') is-invalid @enderror" rows="2"
+                                              placeholder="Alamat lengkap penerima" required>{{ old('alamat_kirim') }}</textarea>
+                                    @error('alamat_kirim')<small class="text-danger">{{ $message }}</small>@enderror
+                                </div>
+                            @endif
 
-                    <div class="field" style="margin-top:var(--sp-5)">
-                        <label class="field__label">Catatan (opsional)</label>
-                        <textarea name="catatan" class="input" rows="2" placeholder="Permintaan khusus, gaya rambut, dll.">{{ old('catatan') }}</textarea>
+                            <div class="mb-3">
+                                <label class="form-label small">Catatan (opsional)</label>
+                                <textarea name="catatan" class="form-control" rows="2" placeholder="Permintaan khusus, gaya rambut, dll.">{{ old('catatan') }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-gold btn-lg w-100"><i class="bi bi-credit-card"></i> Lanjut ke Pembayaran</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="pay-card">
-                    <h3 class="card__title" style="margin-bottom:var(--sp-4)">Ringkasan</h3>
-                    @foreach ($order->orderItems as $item)
-                        <div class="pay-summary__row">
-                            <span>{{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }} <span class="st-muted">x{{ $item->qty }}</span></span>
-                            <span>Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</span>
+                <div class="col-md-5">
+                    <div class="card card-bf">
+                        <div class="card-body p-4">
+                            <h5 class="font-head mb-3">Ringkasan</h5>
+                            @foreach ($order->orderItems as $item)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="small">{{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }} <span class="text-muted">x{{ $item->qty }}</span></span>
+                                    <span class="small">Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</span>
+                                </div>
+                            @endforeach
+                            <hr>
+                            <div class="d-flex justify-content-between"><strong>Total</strong><strong class="price-tag">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</strong></div>
                         </div>
-                    @endforeach
-                    <div class="pay-summary__total"><b>Total</b><b>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</b></div>
-                    <x-button type="submit" size="lg" block class="mt-3" style="margin-top:var(--sp-5)"><i class="bi bi-credit-card"></i> Lanjut ke Pembayaran</x-button>
+                    </div>
                 </div>
             </div>
         </form>

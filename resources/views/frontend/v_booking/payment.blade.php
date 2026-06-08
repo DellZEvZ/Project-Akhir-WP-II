@@ -2,82 +2,75 @@
 @section('title', 'Pembayaran')
 
 @section('content')
-<section class="st-section" style="background:var(--c-surface);min-height:70vh">
-    <div class="st-container">
-        <h1 class="st-head__title" style="margin-bottom:var(--sp-6)">Pembayaran</h1>
-
+<section class="py-5" style="background:#f4f4f4;min-height:70vh;">
+    <div class="container">
+        <h3 class="font-head mb-4">PEMBAYARAN</h3>
         <form action="{{ route('booking.pay', $order->id) }}" method="POST">
             @csrf
             <input type="hidden" name="metode_bayar" id="metodeField" value="transfer">
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <div class="card card-bf">
+                        <div class="card-body p-4">
+                            <div class="pay-tabs">
+                                <button type="button" class="pay-tabbtn active" data-pane="transfer" data-metode="transfer"><i class="bi bi-bank"></i> Transfer Bank</button>
+                                <button type="button" class="pay-tabbtn" data-pane="ewallet" data-metode="ewallet"><i class="bi bi-wallet2"></i> E-Wallet</button>
+                                <button type="button" class="pay-tabbtn" data-pane="cash" data-metode="cash"><i class="bi bi-cash-coin"></i> Bayar di Tempat</button>
+                            </div>
 
-            <div class="pay-wrap">
-                {{-- Panel metode --}}
-                <div class="pay-card">
-                    <div class="pay-tabs">
-                        <button type="button" class="pay-tabbtn is-active" data-pane="transfer" data-metode="transfer"><i class="bi bi-bank"></i> Transfer Bank</button>
-                        <button type="button" class="pay-tabbtn" data-pane="ewallet" data-metode="ewallet"><i class="bi bi-wallet2"></i> E-Wallet</button>
-                        <button type="button" class="pay-tabbtn" data-pane="cash" data-metode="cash"><i class="bi bi-cash-coin"></i> Bayar di Tempat</button>
-                    </div>
+                            <div class="pay-pane active" id="pane-transfer">
+                                @foreach ([['BCA','logo-bca','8800 1234 5678'],['BNI','logo-bni','9880 1234 5678'],['Mandiri','logo-mandiri','7000 1234 5678'],['BRI','logo-bri','0023 1234 5678']] as $b)
+                                    <label class="pay-ch">
+                                        <input type="radio" name="kanal_bayar" value="{{ $b[0] }}" data-group="transfer" @if($loop->first) checked @endif>
+                                        <span class="pay-logo {{ $b[1] }}">{{ $b[0] }}</span>
+                                        <span><strong>Bank {{ $b[0] }}</strong><br><small class="text-muted">VA {{ $b[2] }}</small></span>
+                                    </label>
+                                @endforeach
+                                <div class="alert alert-secondary small mb-0"><i class="bi bi-info-circle"></i> Transfer ke Virtual Account di atas. <strong>Simulasi:</strong> klik "Bayar Sekarang" untuk menandai lunas otomatis.</div>
+                            </div>
 
-                    {{-- Transfer Bank --}}
-                    <div class="pay-pane is-active" id="pane-transfer">
-                        <div class="pay-channels">
-                            @foreach ([['BCA','logo-bca','8800 1234 5678'],['BNI','logo-bni','9880 1234 5678'],['Mandiri','logo-mandiri','7000 1234 5678'],['BRI','logo-bri','0023 1234 5678']] as $b)
-                            <label class="pay-channel">
-                                <input type="radio" name="kanal_bayar" value="{{ $b[0] }}" data-group="transfer" @if($loop->first) checked @endif>
-                                <span class="pay-channel__logo {{ $b[1] }}">{{ $b[0] }}</span>
-                                <span><span class="pay-channel__name">Bank {{ $b[0] }}</span><br><span class="pay-channel__no">VA {{ $b[2] }}</span></span>
-                            </label>
-                            @endforeach
-                        </div>
-                        <div class="pay-note"><i class="bi bi-info-circle"></i> Transfer ke Virtual Account di atas. <strong>Simulasi:</strong> klik "Bayar Sekarang" untuk menandai lunas otomatis.</div>
-                    </div>
+                            <div class="pay-pane" id="pane-ewallet">
+                                @foreach ([['OVO','logo-ovo'],['DANA','logo-dana'],['GoPay','logo-gopay'],['ShopeePay','logo-shopee']] as $w)
+                                    <label class="pay-ch">
+                                        <input type="radio" name="kanal_bayar" value="{{ $w[0] }}" data-group="ewallet">
+                                        <span class="pay-logo {{ $w[1] }}">{{ Str::limit($w[0],4,'') }}</span>
+                                        <span><strong>{{ $w[0] }}</strong><br><small class="text-muted">0812-3456-7890</small></span>
+                                    </label>
+                                @endforeach
+                                <div class="alert alert-secondary small mb-0"><i class="bi bi-phone"></i> Bayar via e-wallet ke nomor terdaftar. <strong>Simulasi</strong> berhasil seketika.</div>
+                            </div>
 
-                    {{-- E-Wallet --}}
-                    <div class="pay-pane" id="pane-ewallet">
-                        <div class="pay-channels">
-                            @foreach ([['OVO','logo-ovo'],['DANA','logo-dana'],['GoPay','logo-gopay'],['ShopeePay','logo-shopee']] as $w)
-                            <label class="pay-channel">
-                                <input type="radio" name="kanal_bayar" value="{{ $w[0] }}" data-group="ewallet">
-                                <span class="pay-channel__logo {{ $w[1] }}">{{ Str::limit($w[0],4,'') }}</span>
-                                <span><span class="pay-channel__name">{{ $w[0] }}</span><br><span class="pay-channel__no">0812-3456-7890</span></span>
-                            </label>
-                            @endforeach
-                        </div>
-                        <div class="pay-note"><i class="bi bi-phone"></i> Bayar via e-wallet ke nomor terdaftar. <strong>Simulasi</strong> pembayaran berhasil seketika.</div>
-                    </div>
+                            <div class="pay-pane" id="pane-cash">
+                                <div class="alert alert-info small mb-0"><i class="bi bi-shop"></i> Pembayaran tunai dilakukan langsung saat kedatangan (layanan) atau penerimaan (produk). Pesanan tetap dikonfirmasi.</div>
+                            </div>
 
-                    {{-- Cash --}}
-                    <div class="pay-pane" id="pane-cash">
-                        <div class="pay-note" style="background:var(--c-primary-050);color:var(--c-ink)">
-                            <i class="bi bi-shop"></i> Pembayaran tunai dilakukan langsung saat kedatangan (layanan) atau penerimaan (produk). Pesanan tetap dikonfirmasi.
+                            <button type="submit" class="btn btn-gold btn-lg w-100 mt-4"><i class="bi bi-shield-check"></i> Bayar Sekarang</button>
                         </div>
                     </div>
-
-                    <x-button type="submit" size="lg" block style="margin-top:var(--sp-5)"><i class="bi bi-shield-check"></i> Bayar Sekarang</x-button>
                 </div>
 
-                {{-- Ringkasan --}}
-                <div class="pay-card">
-                    <h3 class="card__title" style="margin-bottom:var(--sp-4)">Ringkasan Pesanan</h3>
-                    @foreach ($order->orderItems as $item)
-                        <div class="pay-summary__row">
-                            <span>{{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }} <span class="st-muted">x{{ $item->qty }}</span></span>
-                            <span>Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</span>
+                <div class="col-md-5">
+                    <div class="card card-bf">
+                        <div class="card-body p-4">
+                            <h5 class="font-head mb-3">Ringkasan Pesanan</h5>
+                            @foreach ($order->orderItems as $item)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="small">{{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }} <span class="text-muted">x{{ $item->qty }}</span></span>
+                                    <span class="small">Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</span>
+                                </div>
+                            @endforeach
+                            @if ($order->tanggal_booking)
+                                <hr>
+                                <p class="small mb-1"><i class="bi bi-calendar text-gold"></i> {{ $order->tanggal_booking->format('d M Y') }}
+                                    <i class="bi bi-clock text-gold ms-2"></i> {{ $order->jam_booking ? \Carbon\Carbon::parse($order->jam_booking)->format('H:i') : '-' }} WIB</p>
+                            @endif
+                            @if ($order->alamat_kirim)
+                                <p class="small mb-0"><i class="bi bi-geo-alt text-gold"></i> {{ $order->alamat_kirim }}</p>
+                            @endif
+                            <hr>
+                            <div class="d-flex justify-content-between"><strong>Total Bayar</strong><strong class="price-tag">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</strong></div>
                         </div>
-                    @endforeach
-
-                    @if ($order->tanggal_booking)
-                        <p class="st-muted" style="font-size:var(--fs-sm);margin-top:var(--sp-3)">
-                            <i class="bi bi-calendar"></i> {{ $order->tanggal_booking->format('d M Y') }}
-                            <i class="bi bi-clock" style="margin-left:var(--sp-3)"></i> {{ $order->jam_booking ? \Carbon\Carbon::parse($order->jam_booking)->format('H:i') : '-' }} WIB
-                        </p>
-                    @endif
-                    @if ($order->alamat_kirim)
-                        <p class="st-muted" style="font-size:var(--fs-sm)"><i class="bi bi-geo-alt"></i> {{ $order->alamat_kirim }}</p>
-                    @endif
-
-                    <div class="pay-summary__total"><b>Total Bayar</b><b>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</b></div>
+                    </div>
                 </div>
             </div>
         </form>
@@ -90,13 +83,12 @@
     document.querySelectorAll('.pay-tabbtn').forEach(btn => {
         btn.addEventListener('click', () => {
             const pane = btn.dataset.pane;
-            document.querySelectorAll('.pay-tabbtn').forEach(b => b.classList.toggle('is-active', b === btn));
-            document.querySelectorAll('.pay-pane').forEach(p => p.classList.toggle('is-active', p.id === 'pane-' + pane));
+            document.querySelectorAll('.pay-tabbtn').forEach(b => b.classList.toggle('active', b === btn));
+            document.querySelectorAll('.pay-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + pane));
             metodeField.value = btn.dataset.metode;
-            // pilih channel pertama pada grup aktif (selain cash)
-            if (pane !== 'cash') {
+            if (pane !== 'cash' && !document.querySelector('input[data-group=' + pane + ']:checked')) {
                 const first = document.querySelector('#pane-' + pane + ' input[type=radio]');
-                if (first && !document.querySelector('input[data-group=' + pane + ']:checked')) first.checked = true;
+                if (first) first.checked = true;
             }
         });
     });

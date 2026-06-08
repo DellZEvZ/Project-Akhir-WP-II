@@ -2,74 +2,83 @@
 @section('title', 'Katalog')
 
 @section('content')
-
-{{-- Header --}}
-<section class="st-section--dark" style="padding-block:var(--sp-8)">
-    <div class="st-container">
-        <span class="st-head__kicker">Layanan &amp; Produk</span>
-        <h1 class="st-head__title" style="color:var(--c-ice)">Katalog Barber Flow</h1>
-        <p class="st-muted" style="color:rgba(255,255,255,.7)">Pesan layanan grooming dan beli produk perawatan dalam satu keranjang.</p>
+<div class="page-header" style="background-image:url('{{ asset('image/Assets/header-produk.jpg') }}')">
+    <div class="container">
+        <h2 class="font-head mb-0">KATALOG BARBER FLOW</h2>
+        <p class="mb-0 text-gold small">Pesan layanan grooming &amp; beli produk perawatan dalam satu keranjang</p>
     </div>
-</section>
+</div>
 
-<section class="st-section">
-    <div class="st-container">
+<section class="py-5">
+    <div class="container">
 
         {{-- Pencarian --}}
-        <form action="{{ route('front.catalog') }}" method="GET"
-              style="display:flex;gap:var(--sp-3);max-width:560px;margin:0 auto var(--sp-6);">
+        <form action="{{ route('front.catalog') }}" method="GET" class="row g-2 mb-4 justify-content-center">
             <input type="hidden" name="tab" id="tabField" value="{{ $tab }}">
-            <div style="flex:1"><x-input name="search" placeholder="Cari layanan atau produk…" :value="$search" /></div>
-            <x-button type="submit"><i class="bi bi-search"></i></x-button>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Cari layanan atau produk..." value="{{ $search }}">
+                    <button class="btn btn-gold" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
         </form>
 
         {{-- Tab --}}
-        <div class="st-tabs">
-            <button type="button" class="st-tab {{ $tab === 'layanan' ? 'is-active' : '' }}" data-tab="layanan">
-                <i class="bi bi-scissors"></i> Layanan ({{ $layanans->count() }})
-            </button>
-            <button type="button" class="st-tab {{ $tab === 'produk' ? 'is-active' : '' }}" data-tab="produk">
-                <i class="bi bi-bag"></i> Produk ({{ $produks->count() }})
-            </button>
+        <div class="cat-tabs mb-4">
+            <button type="button" class="cat-tab {{ $tab === 'layanan' ? 'active' : '' }}" data-tab="layanan"><i class="bi bi-scissors"></i> Layanan ({{ $layanans->count() }})</button>
+            <button type="button" class="cat-tab {{ $tab === 'produk' ? 'active' : '' }}" data-tab="produk"><i class="bi bi-bag"></i> Produk ({{ $produks->count() }})</button>
         </div>
 
-        {{-- Pane: Layanan --}}
-        <div class="st-tabpane {{ $tab === 'layanan' ? 'is-active' : '' }}" id="pane-layanan">
-            <div class="st-grid st-grid--3">
+        {{-- Pane Layanan --}}
+        <div class="cat-pane {{ $tab === 'layanan' ? 'active' : '' }}" id="pane-layanan">
+            <div class="row g-4">
                 @forelse ($layanans as $l)
                     @php $img = $l->foto ? asset('storage/img-layanan/'.$l->foto) : asset('image/img-default.jpg'); @endphp
-                    <x-card :image="$img" :title="$l->nama_layanan" :href="route('front.layanan.detail', $l->id)" badge="Layanan">
-                        <span class="card__price">Rp {{ number_format($l->harga, 0, ',', '.') }}</span>
-                        <span class="card__meta"><i class="bi bi-clock"></i> {{ $l->durasi_menit }} menit</span>
-                        <x-slot:footer>
-                            <x-button :href="route('booking.add', $l->id)" :data-url="route('booking.add', $l->id)" class="js-add-cart" size="sm" block><i class="bi bi-cart-plus"></i> Masukkan ke Keranjang</x-button>
-                        </x-slot:footer>
-                    </x-card>
+                    <div class="col-md-4 col-6 product-cell">
+                        <div class="card card-bf h-100">
+                            <img src="{{ $img }}" style="height:200px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
+                            <div class="card-body">
+                                <h6 class="font-head mb-1">{{ $l->nama_layanan }}</h6>
+                                <span class="price-tag">Rp {{ number_format($l->harga, 0, ',', '.') }}</span>
+                                <p class="text-muted small mb-0 mt-1"><i class="bi bi-clock"></i> {{ $l->durasi_menit }} menit</p>
+                            </div>
+                            <div class="card-footer bg-white border-0 pb-3 d-flex gap-2">
+                                <a href="{{ route('front.layanan.detail', $l->id) }}" class="btn btn-outline-gold btn-sm">Detail</a>
+                                <a href="{{ route('booking.add', $l->id) }}" data-url="{{ route('booking.add', $l->id) }}" class="btn btn-gold btn-sm flex-fill js-add-cart"><i class="bi bi-cart-plus"></i> Keranjang</a>
+                            </div>
+                        </div>
+                    </div>
                 @empty
-                    <p class="st-empty" style="grid-column:1/-1">Tidak ada layanan ditemukan.</p>
+                    <div class="col-12 text-center py-5"><i class="bi bi-scissors text-muted" style="font-size:46px;"></i><p class="text-muted mt-2">Tidak ada layanan ditemukan.</p></div>
                 @endforelse
             </div>
         </div>
 
-        {{-- Pane: Produk --}}
-        <div class="st-tabpane {{ $tab === 'produk' ? 'is-active' : '' }}" id="pane-produk">
-            <div class="st-grid st-grid--products">
+        {{-- Pane Produk --}}
+        <div class="cat-pane {{ $tab === 'produk' ? 'active' : '' }}" id="pane-produk">
+            <div class="row g-4">
                 @forelse ($produks as $p)
                     @php $img = $p->foto ? asset('storage/img-produk/'.$p->foto) : asset('image/img-default.jpg'); @endphp
-                    <x-card :image="$img" :title="Str::limit($p->nama_produk, 32)" :href="route('front.produk.detail', $p->id)"
-                            :badge="$p->stok <= 0 ? 'Habis' : null">
-                        <span class="card__price">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
-                        <span class="card__meta"><i class="bi bi-box-seam"></i> Stok: {{ $p->stok }}</span>
-                        <x-slot:footer>
-                            @if ($p->stok > 0)
-                                <x-button :href="route('booking.add.produk', $p->id)" :data-url="route('booking.add.produk', $p->id)" class="js-add-cart" size="sm" block><i class="bi bi-cart-plus"></i> Masukkan ke Keranjang</x-button>
-                            @else
-                                <x-button variant="outline" size="sm" block disabled>Stok Habis</x-button>
-                            @endif
-                        </x-slot:footer>
-                    </x-card>
+                    <div class="col-md-3 col-6 product-cell">
+                        <div class="card card-bf h-100">
+                            <img src="{{ $img }}" style="height:200px;object-fit:cover;" alt="{{ $p->nama_produk }}">
+                            <div class="card-body">
+                                <h6 class="font-head mb-1">{{ Str::limit($p->nama_produk, 30) }}</h6>
+                                <span class="price-tag">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
+                                <p class="text-muted small mb-0 mt-1"><i class="bi bi-box"></i> Stok: {{ $p->stok }}</p>
+                            </div>
+                            <div class="card-footer bg-white border-0 pb-3 d-flex gap-2">
+                                <a href="{{ route('front.produk.detail', $p->id) }}" class="btn btn-outline-gold btn-sm">Detail</a>
+                                @if ($p->stok > 0)
+                                    <a href="{{ route('booking.add.produk', $p->id) }}" data-url="{{ route('booking.add.produk', $p->id) }}" class="btn btn-gold btn-sm flex-fill js-add-cart"><i class="bi bi-cart-plus"></i> Keranjang</a>
+                                @else
+                                    <button class="btn btn-secondary btn-sm flex-fill" disabled>Habis</button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 @empty
-                    <p class="st-empty" style="grid-column:1/-1">Tidak ada produk ditemukan.</p>
+                    <div class="col-12 text-center py-5"><i class="bi bi-bag-x text-muted" style="font-size:46px;"></i><p class="text-muted mt-2">Tidak ada produk ditemukan.</p></div>
                 @endforelse
             </div>
         </div>
@@ -79,11 +88,11 @@
 @push('scripts')
 <script>
     const tabField = document.getElementById('tabField');
-    document.querySelectorAll('.st-tab').forEach(btn => {
+    document.querySelectorAll('.cat-tab').forEach(btn => {
         btn.addEventListener('click', () => {
             const t = btn.dataset.tab;
-            document.querySelectorAll('.st-tab').forEach(b => b.classList.toggle('is-active', b === btn));
-            document.querySelectorAll('.st-tabpane').forEach(p => p.classList.toggle('is-active', p.id === 'pane-' + t));
+            document.querySelectorAll('.cat-tab').forEach(b => b.classList.toggle('active', b === btn));
+            document.querySelectorAll('.cat-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + t));
             if (tabField) tabField.value = t;
         });
     });
