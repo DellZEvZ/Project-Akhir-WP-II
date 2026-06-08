@@ -172,6 +172,13 @@ class BookingController extends Controller
 
         $request->validate($rules, $messages);
 
+        // Cegah tabrakan jadwal dengan booking pelanggan lain.
+        if ($order->has_layanan && $this->slotTaken($request->tanggal_booking, $request->jam_booking, $order->id)) {
+            return back()->withInput()->with('error',
+                'Maaf, jadwal ' . $request->tanggal_booking . ' jam ' . $request->jam_booking .
+                ' sudah dibooking pelanggan lain. Silakan pilih jam lain.');
+        }
+
         $order->update([
             'status'          => 'confirmed',
             'jenis'           => $order->has_layanan ? 'booking' : 'produk',
@@ -183,6 +190,30 @@ class BookingController extends Controller
 
         return redirect()->route('booking.payment', $order->id)
             ->with('success', 'Pesanan dikonfirmasi! Silakan selesaikan pembayaran.');
+    }
+
+    /** Cek apakah slot (tanggal+jam) sudah dipakai booking aktif lain. */
+    private function slotTaken($tanggal, $jam, $excludeOrderId): bool
+    {
+        return Order::where('jenis', 'booking')
+            ->whereIn('status', ['confirmed', 'done'])
+            ->where('tanggal_booking', $tanggal)
+            ->where('jam_booking', $jam)
+            ->where('id', '!=', $excludeOrderId)
+            ->exists();
+    }
+
+    /** Daftar jam penuh pada tanggal tertentu (JSON, untuk checkout). */
+    public function slots(Request $request)
+    {
+        $taken = Order::where('jenis', 'booking')
+            ->whereIn('status', ['confirmed', 'done'])
+            ->whereDate('tanggal_booking', $request->get('tanggal'))
+            ->get()
+            ->map(fn ($o) => $o->jam_booking ? \Carbon\Carbon::parse($o->jam_booking)->format('H:i') : null)
+            ->filter()->unique()->values();
+
+        return response()->json(['taken' => $taken]);
     }
 
     /**

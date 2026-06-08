@@ -9,11 +9,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#667eea">
-    <meta name="description" content="CAREXIS - Care Excellence Information System">
-    <meta name="author" content="CAREXIS">
+    <meta name="description" content="BARBERFLOW - Barbershop Management System">
+    <meta name="author" content="BARBERFLOW">
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('image/icon_univ_bsi.png') }}">
-    <title>CAREXIS - Care Excellence Information System</title>
+    <title>BARBERFLOW - Barbershop Management System</title>
     <!-- Custom CSS -->
     <link href="{{ asset('backend/dist/css/style.min.css') }}" rel="stylesheet">
     <!-- Font Awesome -->
@@ -536,8 +536,8 @@
             <div class="auth-box">
                 <!-- Logo Section -->
                 <div class="logo-section">
-                    <h1 class="logo-text">CAREXIS</h1>
-                    <p class="logo-subtitle">Care Excellence Information System</p>
+                    <h1 class="logo-text">BARBERFLOW</h1>
+                    <p class="logo-subtitle">Barbershop Management System</p>
                 </div>
 
                 <!-- Login Form -->

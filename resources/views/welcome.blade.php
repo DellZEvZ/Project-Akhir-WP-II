@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#667eea">
-    <title>CAREXIS - Care Excellence Information System</title>
+    <title>BARBERFLOW - Barbershop Management System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; }
@@ -135,7 +135,7 @@
 <body>
     <header>
         <nav>
-            <div class="logo">CAREXIS</div>
+            <div class="logo">BARBERFLOW</div>
             <button class="nav-toggle" id="navToggle">☰</button>
             <div class="nav-links">
                 <a href="#features">Fitur</a>
@@ -173,9 +173,9 @@
     <div class="container">
         <div class="hero">
             <div class="hero-content">
-                <h1>CAREXIS</h1>
-                <p><strong>Care Excellence Information System</strong></p>
-                <p>Solusi Sistem Informasi Terpadu untuk Manajemen Rumah Sakit Modern</p>
+                <h1>BARBERFLOW</h1>
+                <p><strong>Barbershop Management System</strong></p>
+                <p>Solusi Sistem Informasi Terpadu untuk Manajemen Barbershop Modern</p>
                 <p>Aplikasi mobile-first dirancang khusus untuk mengelola kepegawaian dan inventaris rumah sakit dengan efisien dan real-time.</p>
                 <div class="hero-buttons">
                     <a href="{{ route('login') }}" class="btn btn-light">Masuk Sekarang</a>
@@ -266,7 +266,7 @@
         </section>
 
         <section id="benefits" class="benefits">
-            <h2>Manfaat CAREXIS</h2>
+            <h2>Manfaat BARBERFLOW</h2>
             <div class="benefits-grid">
                 <div class="benefit-item">
                     <div class="benefit-number">70%</div>
@@ -289,7 +289,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2024 CAREXIS - Care Excellence Information System</p>
+        <p>&copy; 2024 BARBERFLOW - Barbershop Management System</p>
         <p>Dirancang untuk meningkatkan efisiensi dan kualitas pelayanan kesehatan.</p>
     </footer>
 

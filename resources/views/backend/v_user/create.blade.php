@@ -37,7 +37,7 @@
     <div class="row">
         <div class="col-12">
             <div class="gradient-header">
-                <h4 class="mb-0"><i class="fas fa-user-plus"></i> Tambah User Baru CAREXIS</h4>
+                <h4 class="mb-0"><i class="fas fa-user-plus"></i> Tambah User Baru BARBERFLOW</h4>
             </div>
         </div>
     </div>

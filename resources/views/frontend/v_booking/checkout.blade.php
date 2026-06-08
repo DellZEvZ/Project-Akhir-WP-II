@@ -16,15 +16,16 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label small">Tanggal <span class="text-danger">*</span></label>
-                                        <input type="date" name="tanggal_booking" class="form-control @error('tanggal_booking') is-invalid @enderror"
+                                        <input type="date" id="tanggal_booking" name="tanggal_booking" class="form-control @error('tanggal_booking') is-invalid @enderror"
                                                min="{{ date('Y-m-d') }}" value="{{ old('tanggal_booking') }}" required>
                                         @error('tanggal_booking')<small class="text-danger">{{ $message }}</small>@enderror
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label small">Jam (09.00–21.00) <span class="text-danger">*</span></label>
-                                        <input type="time" name="jam_booking" class="form-control" min="09:00" max="21:00" value="{{ old('jam_booking') }}" required>
+                                        <input type="time" id="jam_booking" name="jam_booking" class="form-control" min="09:00" max="21:00" value="{{ old('jam_booking') }}" required>
                                     </div>
                                 </div>
+                                <div id="slotInfo" class="small mb-3"></div>
                             @endif
 
                             @if ($order->has_produk)
@@ -64,4 +65,37 @@
         </form>
     </div>
 </section>
+
+@push('scripts')
+<script>
+    const tgl = document.getElementById('tanggal_booking');
+    const jam = document.getElementById('jam_booking');
+    const info = document.getElementById('slotInfo');
+    let takenSlots = [];
+
+    async function loadSlots() {
+        if (!tgl || !tgl.value || !info) return;
+        try {
+            const res = await fetch('{{ route('booking.slots') }}?tanggal=' + tgl.value, { headers: { 'Accept': 'application/json' } });
+            takenSlots = (await res.json()).taken || [];
+            info.innerHTML = takenSlots.length
+                ? '<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Jam penuh pada tanggal ini: <strong>' + takenSlots.join(', ') + '</strong></span>'
+                : '<span class="text-success"><i class="bi bi-check-circle"></i> Semua jam masih tersedia.</span>';
+            checkJam();
+        } catch (e) {}
+    }
+    function checkJam() {
+        if (!jam || !jam.value) return;
+        if (takenSlots.includes(jam.value)) {
+            info.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Jam <strong>' + jam.value + '</strong> sudah dibooking pelanggan lain. Pilih jam lain.</span>';
+            jam.setCustomValidity('Jam sudah penuh');
+        } else {
+            jam.setCustomValidity('');
+        }
+    }
+    tgl?.addEventListener('change', loadSlots);
+    jam?.addEventListener('input', checkJam);
+    loadSlots();
+</script>
+@endpush
 @endsection

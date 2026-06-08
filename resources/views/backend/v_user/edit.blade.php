@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-12">
             <div class="gradient-header">
-                <h4 class="mb-0"><i class="fas fa-user-edit"></i> Edit User CAREXIS</h4>
+                <h4 class="mb-0"><i class="fas fa-user-edit"></i> Edit User BARBERFLOW</h4>
             </div>
         </div>
     </div>

@@ -208,7 +208,7 @@
                     <div class="card-body">
                         <ul class="list-unstyled">
                             <li class="mb-2">
-                                <strong>Nama Sistem:</strong> CAREXIS
+                                <strong>Nama Sistem:</strong> BARBERFLOW
                             </li>
                             <li class="mb-2">
                                 <strong>Versi:</strong> 1.0.0

@@ -35,7 +35,7 @@
             <div class="card-body">
                 <div class="alert alert-info" role="alert">
                     <i class="mdi mdi-information"></i>
-                    <strong>Informasi:</strong> Halaman ini digunakan untuk mengatur konfigurasi sistem CAREXIS.
+                    <strong>Informasi:</strong> Halaman ini digunakan untuk mengatur konfigurasi sistem BARBERFLOW.
                 </div>
 
                 <form action="{{ route('backend.setting.sistem.update') }}" method="POST">
@@ -49,7 +49,7 @@
                                 <label for="app_name" class="form-label font-weight-bold">Nama Aplikasi <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('app_name') is-invalid @enderror"
                                        id="app_name" name="app_name"
-                                       value="{{ old('app_name', $settings['app_name'] ?? 'CAREXIS') }}" required>
+                                       value="{{ old('app_name', $settings['app_name'] ?? 'BARBERFLOW') }}" required>
                                 <small class="form-text text-muted">Nama sistem informasi manajemen terintegrasi</small>
                                 @error('app_name')
                                     <div class="invalid-feedback">{{ $message }}</div>

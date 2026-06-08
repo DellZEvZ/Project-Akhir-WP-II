@@ -54,6 +54,7 @@ Route::middleware('is.customer')->group(function () {
     Route::post('/booking/update/{itemId}', [BookingController::class, 'update'])->name('booking.update');
     Route::post('/booking/remove/{itemId}', [BookingController::class, 'remove'])->name('booking.remove');
     Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
+    Route::get('/booking/slots', [BookingController::class, 'slots'])->name('booking.slots');
     Route::post('/booking/confirm', [BookingController::class, 'confirm'])->name('booking.confirm');
 
     // Pembayaran

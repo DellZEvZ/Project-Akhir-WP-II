@@ -148,7 +148,7 @@
         <!-- Header -->
         <div class="header">
             <h1>{{ $judul }}</h1>
-            <p>CAREXIS - Care Excellence Information System</p>
+            <p>BARBERFLOW - Barbershop Management System</p>
         </div>
 
         <!-- Report Info -->
@@ -209,7 +209,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>Laporan ini adalah dokumen resmi dari sistem CAREXIS</p>
+            <p>Laporan ini adalah dokumen resmi dari sistem BARBERFLOW</p>
             <p>Dicetak pada {{ now()->format('d F Y \p\u\k\u\l H:i:s') }}</p>
         </div>
     </div>

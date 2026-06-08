@@ -53,8 +53,8 @@
 <div class="row">
     <div class="col-12">
         <div class="gradient-header">
-            <h4 class="mb-1"><i class="fas fa-users"></i> Manajemen User CAREXIS</h4>
-            <p class="mb-0">Kelola user yang dapat mengakses sistem CAREXIS</p>
+            <h4 class="mb-1"><i class="fas fa-users"></i> Manajemen User BARBERFLOW</h4>
+            <p class="mb-0">Kelola user yang dapat mengakses sistem BARBERFLOW</p>
         </div>
     </div>
 </div>

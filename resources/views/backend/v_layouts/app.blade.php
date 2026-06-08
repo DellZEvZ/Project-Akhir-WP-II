@@ -16,7 +16,7 @@
     <link href="{{ asset('backend/libs/datatables.net-bs4/css/dataTables.bootstrap4.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/dist/css/style.min.css') }}" rel="stylesheet">
 
-    <!-- CAREXIS Custom Styles -->
+    <!-- BARBERFLOW Custom Styles -->
     <style>
         :root {
             --carexis-primary: #1a1a2e;
@@ -695,10 +695,10 @@
             <footer class="footer text-center">
                 <div class="row">
                     <div class="col-12">
-                        <strong style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CAREXIS</strong>
-                        - Care Excellence Information System untuk Rumah Sakit Modern
+                        <strong style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">BARBERFLOW</strong>
+                        - Barbershop Management System untuk Barbershop Modern
                         <br>
-                        <small class="text-muted">&copy; 2025 CAREXIS. All Rights Reserved.</small>
+                        <small class="text-muted">&copy; 2025 BARBERFLOW. All Rights Reserved.</small>
                     </div>
                 </div>
             </footer>
