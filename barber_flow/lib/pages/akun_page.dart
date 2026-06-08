@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../services/auth_service.dart';
 import 'welcome_page.dart';
+import 'riwayat_page.dart';
 
 /// Manajemen akun: lihat & ubah profil, lalu logout.
 class AkunPage extends StatefulWidget {
@@ -94,7 +95,18 @@ class _AkunPageState extends State<AkunPage> {
                     Text(_email, style: const TextStyle(color: Colors.grey)),
                   ]),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  child: ListTile(
+                    leading: const Icon(Icons.receipt_long, color: AppColors.gold),
+                    title: const Text('Riwayat Pesanan'),
+                    subtitle: const Text('Lihat booking, status & struk'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RiwayatPage())),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 const Text('Edit Profil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 const SizedBox(height: 12),
                 TextField(controller: _namaCtrl, decoration: const InputDecoration(labelText: 'Nama', border: OutlineInputBorder())),

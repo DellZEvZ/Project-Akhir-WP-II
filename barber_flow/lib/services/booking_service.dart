@@ -2,6 +2,13 @@ import 'api_service.dart';
 
 /// Layanan booking ke API (memerlukan token).
 class BookingService {
+  /// Riwayat pesanan customer (booking & produk).
+  static Future<List<Map<String, dynamic>>> fetchOrders() async {
+    final res = await ApiService.get('/booking', auth: true);
+    final List list = res['data'];
+    return list.map((e) => Map<String, dynamic>.from(e)).toList();
+  }
+
   /// Membuat booking. Mengembalikan data booking jika sukses, atau melempar pesan.
   static Future<Map<String, dynamic>> createBooking({
     required List<int> layananIds,

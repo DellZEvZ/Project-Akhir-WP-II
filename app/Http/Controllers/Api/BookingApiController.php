@@ -11,7 +11,7 @@ class BookingApiController extends Controller
 {
     public function index(Request $request)
     {
-        $orders = Order::with('orderItems.layanan')
+        $orders = Order::with('orderItems.layanan', 'orderItems.produk')
             ->where('customer_id', $request->user()->id)
             ->where('status', '!=', 'pending')
             ->latest()
@@ -120,17 +120,26 @@ class BookingApiController extends Controller
     private function format(Order $o): array
     {
         return [
-            'id'              => $o->id,
-            'status'          => $o->status,
-            'status_label'    => $o->status_label,
-            'tanggal_booking' => $o->tanggal_booking?->toDateString(),
-            'jam_booking'     => $o->jam_booking ? \Carbon\Carbon::parse($o->jam_booking)->format('H:i') : null,
-            'total_harga'     => (int) $o->total_harga,
-            'catatan'         => $o->catatan,
-            'items'           => $o->orderItems->map(fn ($i) => [
-                'layanan' => $i->layanan->nama_layanan ?? 'Layanan',
-                'qty'     => $i->qty,
-                'harga'   => (int) $i->harga,
+            'id'                 => $o->id,
+            'jenis'              => $o->jenis,
+            'status'             => $o->status,
+            'status_label'       => $o->status_label,
+            'status_bayar'       => $o->status_bayar,
+            'status_bayar_label' => $o->status_bayar_label,
+            'metode_bayar'       => $o->metode_bayar,
+            'kanal_bayar'        => $o->kanal_bayar,
+            'no_ref'             => $o->no_ref,
+            'dibayar_pada'       => $o->dibayar_pada?->format('d M Y H:i'),
+            'tanggal_booking'    => $o->tanggal_booking?->toDateString(),
+            'jam_booking'        => $o->jam_booking ? \Carbon\Carbon::parse($o->jam_booking)->format('H:i') : null,
+            'alamat_kirim'       => $o->alamat_kirim,
+            'total_harga'        => (int) $o->total_harga,
+            'catatan'            => $o->catatan,
+            'items'              => $o->orderItems->map(fn ($i) => [
+                'nama'  => $i->produk_id ? ($i->produk->nama_produk ?? 'Produk') : ($i->layanan->nama_layanan ?? 'Layanan'),
+                'tipe'  => $i->produk_id ? 'produk' : 'layanan',
+                'qty'   => $i->qty,
+                'harga' => (int) $i->harga,
             ]),
         ];
     }
