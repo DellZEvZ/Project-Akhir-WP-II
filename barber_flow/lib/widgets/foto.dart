@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
 
-/// Menampilkan gambar dari URL dengan fallback ikon jika gagal dimuat.
+/// Menampilkan gambar dari URL dengan fallback ikon jika kosong / gagal dimuat.
 class Foto extends StatelessWidget {
-  final String url;
+  final String? url;
   final double? width;
   final double height;
   final IconData fallbackIcon;
@@ -16,10 +16,20 @@ class Foto extends StatelessWidget {
     this.fallbackIcon = Icons.content_cut,
   });
 
+  Widget _fallback() => Container(
+        width: width ?? double.infinity,
+        height: height,
+        color: AppColors.dark,
+        child: Icon(fallbackIcon, color: AppColors.gold, size: 48),
+      );
+
   @override
   Widget build(BuildContext context) {
+    // Tidak ada foto → tampilkan ikon fallback (hindari Image.network(null)).
+    if (url == null || url!.isEmpty) return _fallback();
+
     return Image.network(
-      url,
+      url!,
       width: width ?? double.infinity,
       height: height,
       fit: BoxFit.cover,
@@ -34,12 +44,7 @@ class Foto extends StatelessWidget {
           ),
         );
       },
-      errorBuilder: (context, error, stack) => Container(
-        width: width ?? double.infinity,
-        height: height,
-        color: AppColors.dark,
-        child: Icon(fallbackIcon, color: AppColors.gold, size: 48),
-      ),
+      errorBuilder: (context, error, stack) => _fallback(),
     );
   }
 }
