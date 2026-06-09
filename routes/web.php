@@ -222,6 +222,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('backend/layanan', LayananController::class, ['as' => 'backend']);
     Route::resource('backend/galeri', GaleriController::class, ['as' => 'backend'])->only(['index','create','store','destroy']);
 
+    // Traffic & Aktivitas (supervisor/pemilik)
+    Route::get('backend/aktivitas', [\App\Http\Controllers\ActivityController::class, 'index'])->name('backend.aktivitas.index');
+
     // Manajemen Booking (admin)
     Route::get('backend/order', [OrderController::class, 'index'])->name('backend.order.index');
     Route::get('backend/order/{order}', [OrderController::class, 'show'])->name('backend.order.show');

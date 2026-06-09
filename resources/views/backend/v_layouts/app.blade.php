@@ -551,6 +551,14 @@
                             </a>
                         </li>
 
+                        {{-- TRAFFIC & AKTIVITAS --}}
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark" href="{{ route('backend.aktivitas.index') }}" aria-expanded="false">
+                                <i class="mdi mdi-pulse"></i>
+                                <span class="hide-menu">Traffic &amp; Aktivitas</span>
+                            </a>
+                        </li>
+
                         {{-- INVENTARIS --}}
                         <li class="sidebar-item">
                             <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">

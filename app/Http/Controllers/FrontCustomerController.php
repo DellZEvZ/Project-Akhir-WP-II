@@ -9,6 +9,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Helpers\ImageHelper;
+use App\Helpers\ActivityLogger;
 
 class FrontCustomerController extends Controller
 {
@@ -40,6 +41,7 @@ class FrontCustomerController extends Controller
         ]);
 
         Session::put('customer', $customer);
+        ActivityLogger::log('create', 'pelanggan', "Pelanggan baru mendaftar: {$customer->nama}", $customer);
 
         return redirect()->route('beranda')
             ->with('success', 'Registrasi berhasil! Selamat datang, ' . $customer->nama . '.');
@@ -62,6 +64,7 @@ class FrontCustomerController extends Controller
         }
 
         Session::put('customer', $customer);
+        ActivityLogger::log('login', 'pelanggan', "Pelanggan {$customer->nama} login", $customer);
 
         return redirect()->route('beranda')
             ->with('success', 'Selamat datang kembali, ' . $customer->nama . '!');
@@ -113,6 +116,7 @@ class FrontCustomerController extends Controller
         $orders = Order::with('orderItems.layanan', 'orderItems.produk')
             ->where('customer_id', $customer->id)
             ->where('status', '!=', 'pending')
+            ->whereNull('hidden_at')   // sembunyikan booking kedaluwarsa
             ->latest()
             ->get();
 

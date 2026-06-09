@@ -14,6 +14,7 @@ class BookingApiController extends Controller
         $orders = Order::with('orderItems.layanan', 'orderItems.produk')
             ->where('customer_id', $request->user()->id)
             ->where('status', '!=', 'pending')
+            ->whereNull('hidden_at')
             ->latest()
             ->get()
             ->map(fn ($o) => $this->format($o));

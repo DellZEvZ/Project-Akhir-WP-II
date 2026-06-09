@@ -9,6 +9,7 @@ use App\Models\Layanan;
 use App\Models\Produk;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Helpers\ActivityLogger;
 
 class BookingController extends Controller
 {
@@ -200,7 +201,8 @@ class BookingController extends Controller
 
         $request->validate($rules, $messages);
 
-        // Cegah tabrakan jadwal dengan booking pelanggan lain.
+        // Cegah tabrakan jadwal: slot (tanggal + jam) tidak boleh dipakai
+        // booking aktif milik pelanggan lain.
         if ($order->has_layanan && $this->slotTaken($request->tanggal_booking, $request->jam_booking, $order->id)) {
             return back()->withInput()->with('error',
                 'Maaf, jadwal ' . $request->tanggal_booking . ' jam ' . $request->jam_booking .
@@ -216,11 +218,19 @@ class BookingController extends Controller
             'catatan'         => $request->catatan,
         ]);
 
+        $nama = Session::get('customer')->nama;
+        $jenis = $order->has_layanan ? 'booking layanan' : 'pembelian produk';
+        ActivityLogger::log('create', 'pesanan', "Pelanggan {$nama} membuat {$jenis} #{$order->id} (Rp " . number_format($order->total_harga, 0, ',', '.') . ')', $order);
+
         return redirect()->route('booking.payment', $order->id)
             ->with('success', 'Pesanan dikonfirmasi! Silakan selesaikan pembayaran.');
     }
 
-    /** Cek apakah slot (tanggal+jam) sudah dipakai booking aktif lain. */
+    /**
+     * Cek apakah slot jadwal (tanggal + jam) sudah dipakai booking aktif lain.
+     * Slot penuh bila ada Order jenis booking berstatus confirmed/done pada
+     * tanggal & jam sama (selain order ini).
+     */
     private function slotTaken($tanggal, $jam, $excludeOrderId): bool
     {
         return Order::where('jenis', 'booking')
@@ -231,12 +241,16 @@ class BookingController extends Controller
             ->exists();
     }
 
-    /** Daftar jam penuh pada tanggal tertentu (JSON, untuk checkout). */
+    /**
+     * Daftar jam yang sudah penuh pada tanggal tertentu (JSON, untuk checkout).
+     */
     public function slots(Request $request)
     {
+        $tanggal = $request->get('tanggal');
+
         $taken = Order::where('jenis', 'booking')
             ->whereIn('status', ['confirmed', 'done'])
-            ->whereDate('tanggal_booking', $request->get('tanggal'))
+            ->whereDate('tanggal_booking', $tanggal)
             ->get()
             ->map(fn ($o) => $o->jam_booking ? \Carbon\Carbon::parse($o->jam_booking)->format('H:i') : null)
             ->filter()->unique()->values();
@@ -301,7 +315,6 @@ class BookingController extends Controller
     {
         $order = $this->ownedOrder($id);
 
-        // Hanya valid bila metode online sudah dipilih & belum lunas.
         if ($order->status_bayar === 'lunas' || ! $order->metode_bayar || $order->metode_bayar === 'cash') {
             return redirect()->route('booking.payment', $order->id);
         }
@@ -320,6 +333,9 @@ class BookingController extends Controller
                 'no_ref'       => 'BF-' . now()->format('ymdHis') . '-' . strtoupper(Str::random(4)),
                 'dibayar_pada' => now(),
             ]);
+
+            $nama = optional(Session::get('customer'))->nama ?? 'Pelanggan';
+            ActivityLogger::log('update', 'pembayaran', "Pelanggan {$nama} membayar pesanan #{$order->id} via {$order->kanal_bayar} (Rp " . number_format($order->total_harga, 0, ',', '.') . ')', $order);
         }
 
         return redirect()->route('booking.struk', $order->id)

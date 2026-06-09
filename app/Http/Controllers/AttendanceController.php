@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Traits\HasPermissionCheck;
+use App\Helpers\ActivityLogger;
 
 class AttendanceController extends Controller
 {
@@ -112,6 +113,8 @@ class AttendanceController extends Controller
 
             DB::commit();
 
+            ActivityLogger::log('login', 'absensi', "Pegawai {$pegawai->nama} check-in pukul " . $attendance->check_in_time->format('H:i'), $attendance);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Check-in berhasil!',
@@ -164,6 +167,8 @@ class AttendanceController extends Controller
             $attendance->save();
 
             DB::commit();
+
+            ActivityLogger::log('logout', 'absensi', "Pegawai {$pegawai->nama} check-out pukul " . $attendance->check_out_time->format('H:i'), $attendance);
 
             return response()->json([
                 'success' => true,

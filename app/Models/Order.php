@@ -16,12 +16,13 @@ class Order extends Model
         'customer_id', 'total_harga', 'status', 'jenis',
         'tanggal_booking', 'jam_booking', 'catatan',
         'metode_bayar', 'kanal_bayar', 'status_bayar', 'bukti_bayar',
-        'alamat_kirim', 'no_ref', 'dibayar_pada',
+        'alamat_kirim', 'no_ref', 'dibayar_pada', 'hidden_at',
     ];
 
     protected $casts = [
         'tanggal_booking' => 'date',
         'dibayar_pada'    => 'datetime',
+        'hidden_at'       => 'datetime',
         'total_harga'     => 'decimal:2',
     ];
 
