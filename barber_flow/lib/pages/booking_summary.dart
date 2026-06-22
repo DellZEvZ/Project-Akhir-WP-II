@@ -57,7 +57,7 @@ class BookingSummary extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ),
           const Center(
-            child: Text('Simulasi pemesanan (data tidak tersimpan)',
+            child: Text('Pesanan Anda telah tersimpan di sistem kami',
                 style: TextStyle(color: Colors.grey, fontSize: 12)),
           ),
           const SizedBox(height: 24),

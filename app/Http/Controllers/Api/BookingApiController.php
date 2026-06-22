@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Layanan;
+use App\Helpers\ActivityLogger;
 use Illuminate\Http\Request;
 
 class BookingApiController extends Controller
@@ -52,6 +53,13 @@ class BookingApiController extends Controller
             $total += $l->harga;
         }
         $order->update(['total_harga' => $total]);
+
+        ActivityLogger::log(
+            'create',
+            'booking',
+            'Mobile Booking Created',
+            $order
+        );
 
         return response()->json([
             'success' => true,
@@ -102,6 +110,17 @@ class BookingApiController extends Controller
                 'dibayar_pada' => now(),
             ]);
         }
+
+        ActivityLogger::log(
+            'update',
+            'booking',
+            "Mobile Payment Processed via {$order->metode_bayar}",
+            $order,
+            [
+                'metode_bayar' => $order->metode_bayar,
+                'no_ref'        => $order->no_ref
+            ]
+        );
 
         return response()->json([
             'success' => true,

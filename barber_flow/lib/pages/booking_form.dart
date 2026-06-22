@@ -62,7 +62,7 @@ class _BookingFormState extends State<BookingForm> {
 
     int? orderId;
 
-    // Jika layanan punya id (dari API) → coba simpan booking ke server.
+    // Jika layanan punya id (dari API) → simpan booking ke server.
     final id = widget.layanan['id'];
     if (id is int) {
       try {
@@ -75,9 +75,22 @@ class _BookingFormState extends State<BookingForm> {
           catatan: _catatanCtrl.text,
         );
         orderId = result['id'] as int?;
-      } catch (_) {
-        // Offline / belum login → lanjut sebagai simulasi lokal.
+      } catch (e) {
+        if (!mounted) return;
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menyimpan booking: $e'), backgroundColor: Colors.red),
+        );
+        return;
       }
+    } else {
+      // Kasus data statis (fallback)
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Data layanan tidak valid.')),
+      );
+      return;
     }
 
     if (!mounted) return;

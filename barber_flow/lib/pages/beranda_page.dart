@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-import '../data/paket_data.dart';
+import '../services/catalog_service.dart';
 import '../widgets/foto.dart';
 import 'detail_layanan.dart';
 
-/// Halaman Beranda — menampilkan paket unggulan dalam GridView.
-class BerandaPage extends StatelessWidget {
+/// Halaman Beranda — menampilkan paket unggulan dari API.
+class BerandaPage extends StatefulWidget {
   const BerandaPage({super.key});
+
+  @override
+  State<BerandaPage> createState() => _BerandaPageState();
+}
+
+class _BerandaPageState extends State<BerandaPage> {
+  late Future<List<Map<String, dynamic>>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = CatalogService.fetchLayanan();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,54 +28,71 @@ class BerandaPage extends StatelessWidget {
         title: const Text('BARBER FLOW'),
         automaticallyImplyLeading: false,
       ),
-      body: ListView(
-        children: [
-          // Banner
-          Stack(
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final semuaLayanan = snapshot.data ?? [];
+          // Ambil top 6 sebagai "Paket Unggulan"
+          final paketUnggulan = semuaLayanan.take(6).toList();
+
+          if (paketUnggulan.isEmpty) {
+            return const Center(child: Text('Belum ada paket unggulan'));
+          }
+
+          return ListView(
             children: [
-              const Foto(
-                url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80',
-                height: 180,
+              // Banner
+              Stack(
+                children: [
+                  const Foto(
+                    url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80',
+                    height: 180,
+                  ),
+                  Container(height: 180, color: Colors.black.withValues(alpha: 0.45)),
+                  const Positioned(
+                    left: 20,
+                    bottom: 24,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Tampil Rapi & Bergaya',
+                            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 4),
+                        Text('Paket grooming terbaik untuk pria',
+                            style: TextStyle(color: AppColors.goldLight, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Container(height: 180, color: Colors.black.withValues(alpha: 0.45)),
-              const Positioned(
-                left: 20,
-                bottom: 24,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Tampil Rapi & Bergaya',
-                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 4),
-                    Text('Paket grooming terbaik untuk pria',
-                        style: TextStyle(color: AppColors.goldLight, fontSize: 13)),
-                  ],
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+                child: Text('Paket Unggulan',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(12),
+                itemCount: paketUnggulan.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  mainAxisExtent: 230,
                 ),
+                itemBuilder: (context, index) {
+                  final paket = paketUnggulan[index];
+                  return _PaketCard(paket: paket);
+                },
               ),
             ],
-          ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
-            child: Text('Paket Unggulan',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(12),
-            itemCount: paketData.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              mainAxisExtent: 230,
-            ),
-            itemBuilder: (context, index) {
-              final paket = paketData[index];
-              return _PaketCard(paket: paket);
-            },
-          ),
-        ],
+          );
+        },
       ),
     );
   }
