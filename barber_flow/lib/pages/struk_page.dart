@@ -47,7 +47,7 @@ class StrukPage extends StatelessWidget {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               const Text.rich(TextSpan(children: [
                 TextSpan(text: 'BARBER', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22)),
-                TextSpan(text: 'FLOW', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22, color: AppColors.gold)),
+                TextSpan(text: 'FLOW', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22, color: AppColors.primary)),
               ])),
               const Text("Men's Grooming & Barbershop", style: TextStyle(color: Colors.grey, fontSize: 12)),
               const SizedBox(height: 8),
@@ -78,7 +78,7 @@ class StrukPage extends StatelessWidget {
               dash,
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 const Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(_rp(order['total_harga']), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.gold)),
+                Text(_rp(order['total_harga']), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary)),
               ]),
               if (order['alamat_kirim'] != null) ...[
                 const SizedBox(height: 8),

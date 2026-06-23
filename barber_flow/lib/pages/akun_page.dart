@@ -82,13 +82,13 @@ class _AkunPageState extends State<AkunPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Akun Saya')),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
                 Center(
                   child: Column(children: [
-                    const CircleAvatar(radius: 40, backgroundColor: AppColors.dark, child: Icon(Icons.person, size: 44, color: AppColors.goldLight)),
+                    const CircleAvatar(radius: 40, backgroundColor: AppColors.dark, child: Icon(Icons.person, size: 44, color: AppColors.primary)),
                     const SizedBox(height: 10),
                     Text(_namaCtrl.text.isEmpty ? 'Pelanggan' : _namaCtrl.text,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
@@ -99,7 +99,7 @@ class _AkunPageState extends State<AkunPage> {
                 Card(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   child: ListTile(
-                    leading: const Icon(Icons.receipt_long, color: AppColors.gold),
+                    leading: const Icon(Icons.receipt_long, color: AppColors.primary),
                     title: const Text('Riwayat Pesanan'),
                     subtitle: const Text('Lihat booking, status & struk'),
                     trailing: const Icon(Icons.chevron_right),

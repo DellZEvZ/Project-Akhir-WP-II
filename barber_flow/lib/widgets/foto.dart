@@ -20,7 +20,7 @@ class Foto extends StatelessWidget {
         width: width ?? double.infinity,
         height: height,
         color: AppColors.dark,
-        child: Icon(fallbackIcon, color: AppColors.gold, size: 48),
+        child: Icon(fallbackIcon, color: AppColors.primary, size: 48),
       );
 
   @override
@@ -40,7 +40,7 @@ class Foto extends StatelessWidget {
           height: height,
           color: AppColors.dark,
           child: const Center(
-            child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
+            child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
           ),
         );
       },

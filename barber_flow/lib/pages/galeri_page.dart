@@ -33,7 +33,7 @@ class _GaleriPageState extends State<GaleriPage> {
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.gold));
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           final list = snap.data ?? [];
           if (list.isEmpty) {
@@ -92,7 +92,7 @@ class _GaleriPageState extends State<GaleriPage> {
                               ),
                               child: Text(
                                 (g['tipe']?.toString() ?? 'foto').toUpperCase(),
-                                style: const TextStyle(color: AppColors.goldLight, fontSize: 10, fontWeight: FontWeight.bold),
+                                style: const TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],

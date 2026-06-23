@@ -115,7 +115,7 @@ class _GatewayPageState extends State<GatewayPage> {
                         child: Column(children: [
                           const Text('Total Pembayaran', style: TextStyle(color: Colors.grey, fontSize: 12)),
                           Text('Rp ${widget.total}',
-                              style: const TextStyle(color: AppColors.gold, fontSize: 26, fontWeight: FontWeight.bold)),
+                              style: const TextStyle(color: AppColors.primary, fontSize: 26, fontWeight: FontWeight.bold)),
                         ]),
                       ),
                       const SizedBox(height: 14),

@@ -49,7 +49,7 @@ class _PaymentPageState extends State<PaymentPage> {
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            icon: const Icon(Icons.store, color: AppColors.gold, size: 48),
+            icon: const Icon(Icons.store, color: AppColors.primary, size: 48),
             title: const Text('Pesanan Dikonfirmasi'),
             content: const Text('Pembayaran tunai dilakukan saat kedatangan / penerimaan.'),
             actions: [
@@ -93,7 +93,7 @@ class _PaymentPageState extends State<PaymentPage> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(widget.namaLayanan, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 6),
-              Text('Total: Rp ${widget.total}', style: const TextStyle(color: AppColors.goldLight, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Total: Rp ${widget.total}', style: const TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold)),
             ]),
           ),
           const SizedBox(height: 20),
@@ -103,16 +103,16 @@ class _PaymentPageState extends State<PaymentPage> {
             final value = m['value'] as String;
             final selected = _metode == value;
             return Card(
-              color: selected ? AppColors.gold.withValues(alpha: 0.12) : null,
+              color: selected ? AppColors.primary.withValues(alpha: 0.12) : null,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: selected ? AppColors.gold : Colors.grey.shade300, width: selected ? 2 : 1),
+                side: BorderSide(color: selected ? AppColors.primary : Colors.grey.shade300, width: selected ? 2 : 1),
               ),
               child: ListTile(
                 onTap: () => _setMetode(value),
-                leading: Icon(m['icon'] as IconData, color: AppColors.gold),
+                leading: Icon(m['icon'] as IconData, color: AppColors.primary),
                 title: Text(m['label'] as String),
-                trailing: Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: selected ? AppColors.gold : Colors.grey),
+                trailing: Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: selected ? AppColors.primary : Colors.grey),
               ),
             );
           }),
@@ -126,13 +126,13 @@ class _PaymentPageState extends State<PaymentPage> {
               return Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: selected ? AppColors.gold : Colors.grey.shade300, width: selected ? 2 : 1),
+                  side: BorderSide(color: selected ? AppColors.primary : Colors.grey.shade300, width: selected ? 2 : 1),
                 ),
                 child: ListTile(
                   onTap: () => setState(() => _kanal = name),
                   leading: _Logo(slug: slug, name: name),
                   title: Text(name),
-                  trailing: Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: selected ? AppColors.gold : Colors.grey),
+                  trailing: Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: selected ? AppColors.primary : Colors.grey),
                 ),
               );
             }),

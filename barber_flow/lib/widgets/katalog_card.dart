@@ -56,7 +56,7 @@ class KatalogCard extends StatelessWidget {
                   Text(
                     _rupiah(item['harga']),
                     style: const TextStyle(
-                      color: AppColors.gold,
+                      color: AppColors.primary,
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),

@@ -26,7 +26,7 @@ class DetailLayanan extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text('Rp ${layanan['harga']}',
                     style: const TextStyle(
-                        color: AppColors.gold, fontSize: 22, fontWeight: FontWeight.bold)),
+                        color: AppColors.primary, fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 Row(
                   children: [

@@ -16,7 +16,7 @@ class WelcomePage extends StatelessWidget {
           padding: const EdgeInsets.all(28),
           children: [
             const SizedBox(height: 60),
-            const Icon(Icons.content_cut, color: AppColors.gold, size: 90),
+            const Icon(Icons.content_cut, color: AppColors.primary, size: 90),
             const SizedBox(height: 20),
             const Text(
               'BARBER FLOW',
@@ -32,7 +32,7 @@ class WelcomePage extends StatelessWidget {
             const Text(
               'Your Style, Your Flow',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.goldLight, fontSize: 16, letterSpacing: 1),
+              style: TextStyle(color: AppColors.grey, fontSize: 16, letterSpacing: 1),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -55,8 +55,8 @@ class WelcomePage extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const LoginPage()),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.goldLight,
-                side: const BorderSide(color: AppColors.gold, width: 2),
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary, width: 2),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),

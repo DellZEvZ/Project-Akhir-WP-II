@@ -51,7 +51,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.gold));
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           if (snap.hasError) {
             return Center(child: Text('Gagal memuat: ${snap.error}'));
@@ -93,7 +93,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
                             Text('${isProduk ? 'Pesanan' : 'Booking'} #${o['id']}',
                                 style: const TextStyle(fontWeight: FontWeight.bold)),
                             Text(_rp(o['total_harga']),
-                                style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
                           ],
                         ),
                         Wrap(children: [

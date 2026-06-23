@@ -22,7 +22,7 @@ class DetailProduk extends StatelessWidget {
                 Chip(
                   label: Text(produk['kategori']?.toString() ?? 'Produk', style: const TextStyle(fontSize: 11)),
                   backgroundColor: AppColors.dark,
-                  labelStyle: const TextStyle(color: AppColors.goldLight),
+                  labelStyle: const TextStyle(color: AppColors.primary),
                   visualDensity: VisualDensity.compact,
                 ),
                 const SizedBox(height: 10),
@@ -31,7 +31,7 @@ class DetailProduk extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text('Rp ${produk['harga']}',
                     style: const TextStyle(
-                        color: AppColors.gold, fontSize: 22, fontWeight: FontWeight.bold)),
+                        color: AppColors.primary, fontSize: 22, fontWeight: FontWeight.bold)),
                 const Divider(height: 30),
                 const Text('Deskripsi',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
