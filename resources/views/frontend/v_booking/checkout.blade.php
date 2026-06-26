@@ -14,15 +14,27 @@
                             @if ($order->has_layanan)
                                 <h5 class="font-head mb-3"><i class="bi bi-calendar-check text-gold"></i> Jadwal Kunjungan</h5>
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <label class="form-label small">Tanggal <span class="text-danger">*</span></label>
                                         <input type="date" id="tanggal_booking" name="tanggal_booking" class="form-control @error('tanggal_booking') is-invalid @enderror"
                                                min="{{ date('Y-m-d') }}" value="{{ old('tanggal_booking') }}" required>
                                         @error('tanggal_booking')<small class="text-danger">{{ $message }}</small>@enderror
                                     </div>
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <label class="form-label small">Jam (09.00–21.00) <span class="text-danger">*</span></label>
                                         <input type="time" id="jam_booking" name="jam_booking" class="form-control" min="09:00" max="21:00" value="{{ old('jam_booking') }}" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small">Pilih Barber <span class="text-danger">*</span></label>
+                                        <select name="barber_id" class="form-select @error('barber_id') is-invalid @enderror" required>
+                                            <option value="">-- Pilih Barber --</option>
+                                            @foreach ($barbers as $barber)
+                                                <option value="{{ $barber->id }}" {{ old('barber_id') == $barber->id ? 'selected' : '' }}>
+                                                    {{ $barber->nama }} ({{ $barber->spesialisasi }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('barber_id')<small class="text-danger">{{ $message }}</small>@enderror
                                     </div>
                                 </div>
                                 <div id="slotInfo" class="small mb-3"></div>

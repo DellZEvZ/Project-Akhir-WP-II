@@ -158,7 +158,8 @@
 <nav class="navbar navbar-expand-lg navbar-bf sticky-top">
     <div class="container">
         <a class="navbar-brand" href="{{ route('beranda') }}">
-            <i class="bi bi-scissors text-gold"></i> BARBER<span class="gold">FLOW</span>
+            <img src="{{ asset('image/logos/logo.png') }}" alt="Barber Flow Logo" style="height: 50px; width: auto; margin-right: 10px;">
+            <span style="vertical-align: middle;">BARBER<span class="gold">FLOW</span></span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
             <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
@@ -212,7 +213,10 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 mb-4">
-                <h4 class="text-white font-head"><i class="bi bi-scissors text-gold"></i> BARBER<span class="text-gold">FLOW</span></h4>
+                <h4 class="text-white font-head">
+                    <img src="{{ asset('image/logos/logo.png') }}" alt="Barber Flow Logo" style="height: 40px; width: auto; vertical-align: middle; margin-right: 10px;">
+                    BARBER<span class="text-gold">FLOW</span>
+                </h4>
                 <p class="small">Barbershop modern dengan layanan men's grooming premium. Tampil rapi, percaya diri, dan bergaya.</p>
                 <div>
                     <a href="#" class="me-2"><i class="bi bi-facebook fs-5"></i></a>

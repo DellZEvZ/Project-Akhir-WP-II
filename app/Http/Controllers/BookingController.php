@@ -171,12 +171,13 @@ class BookingController extends Controller
     public function checkout()
     {
         $order = $this->getCart()->load('orderItems.layanan', 'orderItems.produk');
+        $barbers = \App\Models\Barber::aktif()->get();
 
         if ($order->orderItems->isEmpty()) {
             return redirect()->route('booking.cart')->with('error', 'Keranjang masih kosong.');
         }
 
-        return view('frontend.v_booking.checkout', compact('order'));
+        return view('frontend.v_booking.checkout', compact('order', 'barbers'));
     }
 
     // Konfirmasi checkout — jadwal hanya untuk layanan, alamat hanya untuk produk
@@ -194,6 +195,7 @@ class BookingController extends Controller
         if ($order->has_layanan) {
             $rules['tanggal_booking'] = 'required|date|after_or_equal:today';
             $rules['jam_booking']     = 'required';
+            $rules['barber_id']       = 'required|exists:barbers,id';
         }
         if ($order->has_produk) {
             $rules['alamat_kirim'] = 'required|string|max:500';
@@ -214,6 +216,7 @@ class BookingController extends Controller
             'jenis'           => $order->has_layanan ? 'booking' : 'produk',
             'tanggal_booking' => $request->tanggal_booking,
             'jam_booking'     => $request->jam_booking,
+            'barber_id'       => $request->barber_id ?? null,
             'alamat_kirim'    => $request->alamat_kirim,
             'catatan'         => $request->catatan,
         ]);

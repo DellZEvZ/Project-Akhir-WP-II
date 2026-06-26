@@ -29,6 +29,11 @@
                                     </label>
                                 @endforeach
                                 <div class="alert alert-secondary small mb-0"><i class="bi bi-info-circle"></i> Pilih bank, lalu lanjut ke gateway pembayaran mitra (simulasi).</div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <a href="{{ route('booking.checkout') }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                                        <i class="bi bi-arrow-left"></i> Pilih Ulang / Batal
+                                    </a>
+                                </div>
                             </div>
 
                             <div class="pay-pane" id="pane-ewallet">
@@ -42,10 +47,20 @@
                                     </label>
                                 @endforeach
                                 <div class="alert alert-secondary small mb-0"><i class="bi bi-phone"></i> Pilih e-wallet, lalu lanjut ke gateway pembayaran mitra (simulasi).</div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <a href="{{ route('booking.checkout') }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                                        <i class="bi bi-arrow-left"></i> Pilih Ulang / Batal
+                                    </a>
+                                </div>
                             </div>
 
                             <div class="pay-pane" id="pane-cash">
                                 <div class="alert alert-info small mb-0"><i class="bi bi-shop"></i> Pembayaran tunai dilakukan langsung saat kedatangan (layanan) atau penerimaan (produk). Pesanan tetap dikonfirmasi.</div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <a href="{{ route('booking.checkout') }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                                        <i class="bi bi-arrow-left"></i> Pilih Ulang / Batal
+                                    </a>
+                                </div>
                             </div>
 
                             <button type="submit" class="btn btn-gold btn-lg w-100 mt-4"><i class="bi bi-arrow-right-circle"></i> Lanjut ke Pembayaran</button>

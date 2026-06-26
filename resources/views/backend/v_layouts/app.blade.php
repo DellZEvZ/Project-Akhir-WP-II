@@ -337,7 +337,7 @@
                     <a class="navbar-brand" href="{{ route('backend.beranda') }}">
                         <!-- Logo icon -->
                         <b class="logo-icon p-l-10">
-                            <i class="mdi mdi-content-cut" style="font-size: 32px; color: #daa520;"></i>
+                            <img src="{{ asset('image/logos/logo.png') }}" alt="Barber Flow Logo" style="height: 40px; width: auto;">
                         </b>
                         <!--End Logo icon -->
                          <!-- Logo text -->

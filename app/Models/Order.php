@@ -13,7 +13,7 @@ class Order extends Model
     protected $guarded = ['id'];
 
     protected $fillable = [
-        'customer_id', 'total_harga', 'status', 'jenis',
+        'customer_id', 'total_harga', 'status', 'jenis', 'barber_id',
         'tanggal_booking', 'jam_booking', 'catatan',
         'metode_bayar', 'kanal_bayar', 'status_bayar', 'bukti_bayar',
         'alamat_kirim', 'no_ref', 'dibayar_pada', 'hidden_at',
@@ -34,6 +34,11 @@ class Order extends Model
     public function getHasProdukAttribute(): bool
     {
         return $this->orderItems->whereNotNull('produk_id')->isNotEmpty();
+    }
+
+    public function barber()
+    {
+        return $this->belongsTo(Barber::class);
     }
 
     public function customer()
