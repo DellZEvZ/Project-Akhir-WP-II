@@ -19,6 +19,7 @@ use App\Http\Controllers\FrontController;
 use App\Http\Controllers\FrontCustomerController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RajaOngkirController;
 
 // ========== FRONTEND PUBLIK (Barber Flow) ==========
 Route::get('/', [FrontController::class, 'index'])->name('beranda');
@@ -56,6 +57,12 @@ Route::middleware('is.customer')->group(function () {
     Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
     Route::get('/booking/slots', [BookingController::class, 'slots'])->name('booking.slots');
     Route::post('/booking/confirm', [BookingController::class, 'confirm'])->name('booking.confirm');
+
+    // Alamat & Ongkos Kirim (RajaOngkir) — khusus order berisi produk
+    Route::get('/booking/shipping', [BookingController::class, 'selectShipping'])->name('booking.shipping');
+    Route::post('/booking/shipping/update', [BookingController::class, 'updateOngkir'])->name('booking.shipping.update');
+    Route::get('/booking/shipping/search', [RajaOngkirController::class, 'searchDestination'])->name('booking.shipping.search');
+    Route::post('/booking/shipping/cost', [RajaOngkirController::class, 'getCost'])->name('booking.shipping.cost');
 
     // Pembayaran
     Route::get('/pembayaran/{id}', [BookingController::class, 'payment'])->name('booking.payment');

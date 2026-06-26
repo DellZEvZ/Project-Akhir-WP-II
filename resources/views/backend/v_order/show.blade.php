@@ -43,6 +43,10 @@
                     <tr><th>Jam</th><td>{{ $order->jam_booking ? \Carbon\Carbon::parse($order->jam_booking)->format('H:i') : '-' }} WIB</td></tr>
                     @else
                     <tr><th>Alamat Kirim</th><td>{{ $order->alamat_kirim ?? '-' }}</td></tr>
+                    <tr><th>Tujuan</th><td>{{ $order->kota_tujuan_label ?? '-' }}</td></tr>
+                    <tr><th>Kurir</th><td>{{ $order->kurir ? $order->kurir . ' ' . $order->layanan_ongkir : '-' }}</td></tr>
+                    <tr><th>Ongkos Kirim</th><td>{{ $order->biaya_ongkir_format }}</td></tr>
+                    <tr><th>Estimasi</th><td>{{ $order->estimasi_ongkir ?? '-' }}</td></tr>
                     @endif
                     <tr><th>Status</th>
                         <td>
@@ -126,9 +130,15 @@
                         @endforeach
                     </tbody>
                     <tfoot>
+                        @if ($order->biaya_ongkir > 0)
+                        <tr>
+                            <td colspan="3" class="text-right">Ongkos Kirim ({{ $order->kurir }} {{ $order->layanan_ongkir }})</td>
+                            <td>{{ $order->biaya_ongkir_format }}</td>
+                        </tr>
+                        @endif
                         <tr class="font-weight-bold">
                             <td colspan="3" class="text-right">Total</td>
-                            <td>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
+                            <td>Rp {{ number_format($order->total_akhir, 0, ',', '.') }}</td>
                         </tr>
                     </tfoot>
                 </table>

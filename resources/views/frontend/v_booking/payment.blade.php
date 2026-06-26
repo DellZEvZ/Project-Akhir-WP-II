@@ -84,10 +84,20 @@
                                     <i class="bi bi-clock text-gold ms-2"></i> {{ $order->jam_booking ? \Carbon\Carbon::parse($order->jam_booking)->format('H:i') : '-' }} WIB</p>
                             @endif
                             @if ($order->alamat_kirim)
-                                <p class="small mb-0"><i class="bi bi-geo-alt text-gold"></i> {{ $order->alamat_kirim }}</p>
+                                <p class="small mb-1"><i class="bi bi-geo-alt text-gold"></i> {{ $order->alamat_kirim }}
+                                    @if ($order->kota_tujuan_label)
+                                        <br><span class="text-muted">{{ $order->kota_tujuan_label }}</span>
+                                    @endif
+                                </p>
+                            @endif
+                            @if ($order->biaya_ongkir > 0)
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span>Ongkos Kirim <span class="text-muted">({{ $order->kurir }} {{ $order->layanan_ongkir }})</span></span>
+                                    <span>{{ $order->biaya_ongkir_format }}</span>
+                                </div>
                             @endif
                             <hr>
-                            <div class="d-flex justify-content-between"><strong>Total Bayar</strong><strong class="price-tag">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</strong></div>
+                            <div class="d-flex justify-content-between"><strong>Total Bayar</strong><strong class="price-tag">Rp {{ number_format($order->total_akhir, 0, ',', '.') }}</strong></div>
                         </div>
                     </div>
                 </div>

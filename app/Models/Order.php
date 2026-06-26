@@ -10,13 +10,14 @@ class Order extends Model
     use HasFactory;
 
     protected $table = 'orders';
-    protected $guarded = ['id'];
 
     protected $fillable = [
         'customer_id', 'total_harga', 'status', 'jenis', 'barber_id',
         'tanggal_booking', 'jam_booking', 'catatan',
         'metode_bayar', 'kanal_bayar', 'status_bayar', 'bukti_bayar',
         'alamat_kirim', 'no_ref', 'dibayar_pada', 'hidden_at',
+        'kota_tujuan_id', 'kota_tujuan_label', 'kurir', 'layanan_ongkir',
+        'biaya_ongkir', 'estimasi_ongkir', 'total_berat',
     ];
 
     protected $casts = [
@@ -34,6 +35,20 @@ class Order extends Model
     public function getHasProdukAttribute(): bool
     {
         return $this->orderItems->whereNotNull('produk_id')->isNotEmpty();
+    }
+
+    /**
+     * Total akhir = total harga item + ongkos kirim (jika ada).
+     * Untuk order jenis 'booking' (tanpa pengiriman), ongkir selalu 0.
+     */
+    public function getTotalAkhirAttribute()
+    {
+        return (float) $this->total_harga + (float) $this->biaya_ongkir;
+    }
+
+    public function getBiayaOngkirFormatAttribute(): string
+    {
+        return 'Rp ' . number_format($this->biaya_ongkir, 0, ',', '.');
     }
 
     public function barber()

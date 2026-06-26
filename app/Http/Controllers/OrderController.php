@@ -36,7 +36,7 @@ class OrderController extends Controller
             'confirmed'  => Order::where('status', 'confirmed')->count(),
             'done'       => Order::where('status', 'done')->count(),
             'verifikasi' => Order::where('status_bayar', 'menunggu_verifikasi')->count(),
-            'pendapatan' => Order::where('status_bayar', 'lunas')->sum('total_harga'),
+            'pendapatan' => Order::where('status_bayar', 'lunas')->get()->sum(fn ($o) => $o->total_akhir),
         ];
 
         return view('backend.v_order.index', [

@@ -109,7 +109,7 @@
                             @endif
                         </td>
                         <td>{{ $order->orderItems->count() }} item</td>
-                        <td>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($order->total_akhir, 0, ',', '.') }}</td>
                         <td>
                             @if ($order->status == 'confirmed')
                                 <span class="badge badge-warning">Dikonfirmasi</span>

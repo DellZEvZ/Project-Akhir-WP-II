@@ -177,7 +177,80 @@ class BookingController extends Controller
             return redirect()->route('booking.cart')->with('error', 'Keranjang masih kosong.');
         }
 
+        // Order berisi produk (dikirim) wajib pilih ongkos kirim dulu sebelum checkout.
+        if ($order->has_produk && ! $order->kota_tujuan_id) {
+            return redirect()->route('booking.shipping')
+                ->with('error', 'Silakan pilih alamat & ongkos kirim terlebih dahulu.');
+        }
+
         return view('frontend.v_booking.checkout', compact('order', 'barbers'));
+    }
+
+    /**
+     * Halaman pilih alamat tujuan & ongkos kirim (RajaOngkir) — khusus order
+     * yang berisi produk fisik (dikirim), tidak berlaku untuk booking layanan.
+     */
+    public function selectShipping()
+    {
+        $order = $this->getCart()->load('orderItems.produk');
+
+        if ($order->orderItems->isEmpty()) {
+            return redirect()->route('booking.cart')->with('error', 'Keranjang masih kosong.');
+        }
+
+        if (! $order->has_produk) {
+            return redirect()->route('booking.checkout');
+        }
+
+        // Total berat (gram) seluruh item produk dalam keranjang.
+        $totalBerat = $order->orderItems->sum(function ($item) {
+            return ($item->produk->berat ?? 0) * $item->qty;
+        });
+        // Minimal 1 gram agar tidak ditolak API RajaOngkir.
+        $totalBerat = max(1, $totalBerat);
+
+        $origin = config('services.rajaongkir.origin');
+        $customer = Session::get('customer');
+
+        return view('frontend.v_booking.shipping', compact('order', 'totalBerat', 'origin', 'customer'));
+    }
+
+    /**
+     * Simpan pilihan alamat tujuan & ongkos kirim ke order, lalu kembali ke checkout.
+     */
+    public function updateOngkir(Request $request)
+    {
+        $request->validate([
+            'alamat_kirim'      => 'required|string|max:500',
+            'kota_tujuan_id'    => 'required|string',
+            'kota_tujuan_label' => 'required|string',
+            'kurir'             => 'required|string',
+            'layanan_ongkir'    => 'required|string',
+            'biaya_ongkir'      => 'required|numeric|min:0',
+            'estimasi_ongkir'   => 'nullable|string',
+            'total_berat'       => 'required|numeric|min:1',
+        ], [
+            'alamat_kirim.required'      => 'Alamat lengkap wajib diisi.',
+            'kota_tujuan_id.required'    => 'Pilih kecamatan/kota tujuan dari daftar yang muncul.',
+            'kurir.required'             => 'Klik "Cek Ongkos Kirim" lalu pilih salah satu kurir.',
+            'biaya_ongkir.required'      => 'Klik "Cek Ongkos Kirim" lalu pilih salah satu kurir.',
+        ]);
+
+        $order = $this->getCart();
+
+        $order->update([
+            'alamat_kirim'      => $request->alamat_kirim,
+            'kota_tujuan_id'    => $request->kota_tujuan_id,
+            'kota_tujuan_label' => $request->kota_tujuan_label,
+            'kurir'             => strtoupper($request->kurir),
+            'layanan_ongkir'    => $request->layanan_ongkir,
+            'biaya_ongkir'      => $request->biaya_ongkir,
+            'estimasi_ongkir'   => $request->estimasi_ongkir,
+            'total_berat'       => $request->total_berat,
+        ]);
+
+        return redirect()->route('booking.checkout')
+            ->with('success', 'Pengiriman dipilih. Silakan lanjutkan checkout.');
     }
 
     // Konfirmasi checkout — jadwal hanya untuk layanan, alamat hanya untuk produk
@@ -197,11 +270,15 @@ class BookingController extends Controller
             $rules['jam_booking']     = 'required';
             $rules['barber_id']       = 'required|exists:barbers,id';
         }
-        if ($order->has_produk) {
-            $rules['alamat_kirim'] = 'required|string|max:500';
-        }
 
         $request->validate($rules, $messages);
+
+        // Order berisi produk (dikirim) wajib sudah memilih alamat & ongkos kirim
+        // di halaman shipping sebelum bisa dikonfirmasi.
+        if ($order->has_produk && ! $order->kota_tujuan_id) {
+            return redirect()->route('booking.shipping')
+                ->with('error', 'Silakan pilih alamat & ongkos kirim terlebih dahulu.');
+        }
 
         // Cegah tabrakan jadwal: slot (tanggal + jam) tidak boleh dipakai
         // booking aktif milik pelanggan lain.
@@ -217,7 +294,6 @@ class BookingController extends Controller
             'tanggal_booking' => $request->tanggal_booking,
             'jam_booking'     => $request->jam_booking,
             'barber_id'       => $request->barber_id ?? null,
-            'alamat_kirim'    => $request->alamat_kirim,
             'catatan'         => $request->catatan,
         ]);
 

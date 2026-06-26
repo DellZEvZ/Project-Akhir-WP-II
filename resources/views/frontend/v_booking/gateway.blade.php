@@ -31,7 +31,7 @@
 
                 <div class="text-center py-2 mb-3" style="background:#f6f6f6;border-radius:10px;">
                     <div class="text-muted small">Total Pembayaran</div>
-                    <div class="price-tag" style="font-size:30px;">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</div>
+                    <div class="price-tag" style="font-size:30px;">Rp {{ number_format($order->total_akhir, 0, ',', '.') }}</div>
                 </div>
 
                 @if ($isBank)

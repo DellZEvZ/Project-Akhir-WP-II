@@ -31,14 +31,20 @@
                         <span>Rp {{ number_format($item->qty * $item->harga, 0, ',', '.') }}</span>
                     </div>
                 @endforeach
+                @if ($order->biaya_ongkir > 0)
+                    <div class="struk-row mb-1">
+                        <span>Ongkos Kirim ({{ $order->kurir }} {{ $order->layanan_ongkir }})</span>
+                        <span>{{ $order->biaya_ongkir_format }}</span>
+                    </div>
+                @endif
             </div>
 
             <div class="struk-row" style="font-size:18px;font-weight:700;">
-                <span>TOTAL</span><span class="text-gold">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                <span>TOTAL</span><span class="text-gold">Rp {{ number_format($order->total_akhir, 0, ',', '.') }}</span>
             </div>
 
             @if ($order->alamat_kirim)
-                <div class="struk-row mt-2"><span>Kirim ke</span><span style="text-align:right;max-width:60%;">{{ $order->alamat_kirim }}</span></div>
+                <div class="struk-row mt-2"><span>Kirim ke</span><span style="text-align:right;max-width:60%;">{{ $order->alamat_kirim }}@if($order->kota_tujuan_label), {{ $order->kota_tujuan_label }}@endif</span></div>
             @endif
 
             @if ($order->status_bayar === 'lunas')
@@ -68,7 +74,7 @@
         const el = document.getElementById('qrcode');
         if (!el || typeof QRCode === 'undefined') return;
         new QRCode(el, {
-            text: @json('BARBERFLOW|order:'.$order->id.'|ref:'.($order->no_ref ?? '-').'|total:'.$order->total_harga),
+            text: @json('BARBERFLOW|order:'.$order->id.'|ref:'.($order->no_ref ?? '-').'|total:'.$order->total_akhir),
             width: 150, height: 150, colorDark: '#161616', colorLight: '#ffffff',
             correctLevel: QRCode.CorrectLevel.M
         });

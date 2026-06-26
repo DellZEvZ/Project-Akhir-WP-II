@@ -190,7 +190,7 @@
                                 <td>{{ $o->customer->nama ?? '-' }}</td>
                                 <td>{{ $o->tanggal_booking?->format('d/m/Y') ?? '-' }} {{ $o->jam_booking ? \Carbon\Carbon::parse($o->jam_booking)->format('H:i') : '' }}</td>
                                 <td>{{ $o->orderItems->count() }} layanan</td>
-                                <td>Rp {{ number_format($o->total_harga, 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($o->total_akhir, 0, ',', '.') }}</td>
                                 <td>
                                     @if ($o->status == 'confirmed')
                                         <span class="badge badge-warning">Dikonfirmasi</span>

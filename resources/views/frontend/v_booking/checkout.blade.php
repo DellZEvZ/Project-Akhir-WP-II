@@ -42,10 +42,11 @@
 
                             @if ($order->has_produk)
                                 <h5 class="font-head mb-3 {{ $order->has_layanan ? 'mt-2' : '' }}"><i class="bi bi-truck text-gold"></i> Alamat Pengiriman</h5>
-                                <div class="mb-3">
-                                    <textarea name="alamat_kirim" class="form-control @error('alamat_kirim') is-invalid @enderror" rows="2"
-                                              placeholder="Alamat lengkap penerima" required>{{ old('alamat_kirim') }}</textarea>
-                                    @error('alamat_kirim')<small class="text-danger">{{ $message }}</small>@enderror
+                                <div class="border rounded p-3 mb-3" style="background:#fafafa;">
+                                    <div class="small">{{ $order->alamat_kirim }}</div>
+                                    <div class="small text-muted">{{ $order->kota_tujuan_label }}</div>
+                                    <div class="small text-muted mt-1">Kurir: {{ $order->kurir }} {{ $order->layanan_ongkir }} &middot; Ongkir: {{ $order->biaya_ongkir_format }}</div>
+                                    <a href="{{ route('booking.shipping') }}" class="small">Ubah alamat / kurir</a>
                                 </div>
                             @endif
 
@@ -69,7 +70,12 @@
                                 </div>
                             @endforeach
                             <hr>
-                            <div class="d-flex justify-content-between"><strong>Total</strong><strong class="price-tag">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</strong></div>
+                            @if ($order->biaya_ongkir > 0)
+                                <div class="d-flex justify-content-between mb-2 small">
+                                    <span>Ongkos Kirim</span><span>{{ $order->biaya_ongkir_format }}</span>
+                                </div>
+                            @endif
+                            <div class="d-flex justify-content-between"><strong>Total</strong><strong class="price-tag">Rp {{ number_format($order->total_akhir, 0, ',', '.') }}</strong></div>
                         </div>
                     </div>
                 </div>

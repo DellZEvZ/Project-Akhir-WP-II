@@ -76,7 +76,7 @@
                                         {{ $order->status_bayar_label }}
                                     </span>
                                 </div>
-                                <span class="price-tag">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                                <span class="price-tag">Rp {{ number_format($order->total_akhir, 0, ',', '.') }}</span>
                             </div>
                             @if ($order->jenis === 'booking')
                             <p class="small text-muted mb-2">
@@ -91,6 +91,12 @@
                                     {{ $item->layanan->nama_layanan ?? $item->produk->nama_produk ?? 'Item' }} ({{ $item->qty }}x) — Rp {{ number_format($item->harga, 0, ',', '.') }}
                                 </li>
                                 @endforeach
+                                @if ($order->biaya_ongkir > 0)
+                                <li>
+                                    <i class="bi bi-truck text-gold"></i>
+                                    Ongkos Kirim ({{ $order->kurir }} {{ $order->layanan_ongkir }}) — {{ $order->biaya_ongkir_format }}
+                                </li>
+                                @endif
                             </ul>
                             @if ($order->catatan)
                                 <p class="small text-muted mt-2 mb-0"><i class="bi bi-chat-left-text"></i> {{ $order->catatan }}</p>
