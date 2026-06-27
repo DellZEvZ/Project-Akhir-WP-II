@@ -10,7 +10,7 @@ RUN npm run build
 FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --ignore-platform-req=php
 
 # Stage 3: Final runtime image
 FROM php:8.2-apache
@@ -45,7 +45,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Set Apache Document Root to /public
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's#\/var\/www\/html#${APACHE_DOCUMENT_ROOT}#g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's#\/var\/www\/html#${APACHE_DOCUMENT_ROOT}#g' /etc/apache2/apache2.conf
 

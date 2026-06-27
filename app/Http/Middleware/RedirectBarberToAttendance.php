@@ -37,13 +37,6 @@ class RedirectBarberToAttendance
     {
         $user = Auth::user();
 
-        // TEMPORARY DEBUG LOG - hapus setelah masalah teratasi
-        \Log::info('RedirectBarberToAttendance check', [
-            'route' => $request->route()?->getName(),
-            'user' => $user?->email,
-            'has_barber_role' => $user?->hasRole('barber'),
-        ]);
-
         if ($user && $user->hasRole('barber')) {
             $routeName = $request->route()?->getName();
 
