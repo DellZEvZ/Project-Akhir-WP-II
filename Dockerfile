@@ -49,8 +49,16 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's#\/var\/www\/html#${APACHE_DOCUMENT_ROOT}#g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's#\/var\/www\/html#${APACHE_DOCUMENT_ROOT}#g' /etc/apache2/apache2.conf
 
-# Optimize Composer autoloader
-RUN composer dump-autoload --optimize
+# Optimize Composer autoloader.
+# Catatan: dump-autoload memicu hook post-autoload-dump (artisan package:discover),
+# yang butuh app Laravel bisa di-bootstrap (APP_KEY & config dasar). Karena .env
+# tidak ikut di-copy ke image (lihat .dockerignore), pakai .env.example sebagai
+# konteks sementara hanya untuk proses build ini; .env asli tetap di-inject saat
+# container berjalan (lewat env vars / volume / entrypoint sesuai platform deploy).
+RUN cp .env.example .env \
+    && php artisan key:generate --force \
+    && composer dump-autoload --optimize \
+    && rm .env
 
 EXPOSE 80
 
