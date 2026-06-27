@@ -54,6 +54,11 @@ class LoginController extends Controller
             // Set success message for sweet alert
             session()->flash('success', 'Selamat datang, ' . $user->nama);
 
+            // Akun barber hanya memiliki akses ke halaman Absensi.
+            if ($user->hasRole('barber')) {
+                return redirect()->route('attendance.index');
+            }
+
             return redirect()->route('backend.beranda');
         }
 

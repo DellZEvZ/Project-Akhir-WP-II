@@ -105,6 +105,12 @@ class QuickLoginController extends Controller
         $roleName = $user->roles->first()->display_name ?? 'No Role';
         $permissionCount = $user->roles->first()->permissions()->count() ?? 0;
 
+        // Akun barber hanya boleh ke halaman absensi, langsung arahkan ke sana.
+        if ($user->hasRole('barber')) {
+            return redirect()->route('attendance.index')
+                ->with('success', "Berhasil login sebagai {$user->nama} ({$roleName}) - diarahkan ke halaman Absensi");
+        }
+
         return redirect()->route('backend.beranda')
             ->with('success', "Berhasil login sebagai {$user->nama} ({$roleName} - {$permissionCount} permissions)");
     }

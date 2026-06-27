@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Traits\HasPermissionCheck;
 
 class OrderController extends Controller
 {
+    use HasPermissionCheck;
+
     public function index(Request $request)
     {
+        if ($response = $this->checkPermission('order.view', 'Anda tidak memiliki izin untuk melihat data pesanan.')) {
+            return $response;
+        }
+
         // Hanya order yang sudah dikonfirmasi customer (bukan keranjang 'pending')
         $query = Order::with(['customer', 'orderItems.layanan', 'orderItems.produk'])
             ->where('status', '!=', 'pending');
@@ -48,6 +55,10 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        if ($response = $this->checkPermission('order.view', 'Anda tidak memiliki izin untuk melihat detail pesanan.')) {
+            return $response;
+        }
+
         $order->load(['customer', 'orderItems.layanan', 'orderItems.produk']);
 
         return view('backend.v_order.show', [
@@ -58,6 +69,10 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, Order $order)
     {
+        if ($response = $this->checkPermission('order.manage', 'Anda tidak memiliki izin untuk mengubah status pesanan.')) {
+            return $response;
+        }
+
         $request->validate([
             'status' => 'required|in:confirmed,done,batal',
         ]);
@@ -69,6 +84,10 @@ class OrderController extends Controller
 
     public function verifyPayment(Request $request, Order $order)
     {
+        if ($response = $this->checkPermission('order.manage', 'Anda tidak memiliki izin untuk memverifikasi pembayaran.')) {
+            return $response;
+        }
+
         $request->validate(['aksi' => 'required|in:lunas,tolak']);
 
         if ($request->aksi === 'lunas') {

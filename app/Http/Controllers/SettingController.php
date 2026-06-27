@@ -7,14 +7,21 @@ use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\Setting;
 use App\Helpers\ActivityLogger;
+use App\Traits\HasPermissionCheck;
 
 class SettingController extends Controller
 {
+    use HasPermissionCheck;
+
     /**
      * Display System Settings
      */
     public function sistem()
     {
+        if ($response = $this->checkPermission('settings.view', 'Anda tidak memiliki izin untuk melihat pengaturan sistem.')) {
+            return $response;
+        }
+
         $settings = Setting::getAll();
 
         return view('backend.v_setting.sistem', [
@@ -28,6 +35,10 @@ class SettingController extends Controller
      */
     public function updateSistem(Request $request)
     {
+        if ($response = $this->checkPermission('settings.update', 'Anda tidak memiliki izin untuk mengubah pengaturan sistem.')) {
+            return $response;
+        }
+
         $validated = $request->validate([
             'app_name' => 'required|string|max:255',
             'app_version' => 'required|string|max:50',
@@ -81,6 +92,10 @@ class SettingController extends Controller
      */
     public function log(Request $request)
     {
+        if ($response = $this->checkPermission('settings.view', 'Anda tidak memiliki izin untuk melihat log aktivitas.')) {
+            return $response;
+        }
+
         // Build query
         $query = ActivityLog::with('user')->latest();
 

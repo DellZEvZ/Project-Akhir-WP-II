@@ -43,6 +43,12 @@ class PermissionsTableSeeder extends Seeder
             ['name' => 'absensi.delete', 'display_name' => 'Hapus Absensi', 'description' => 'Dapat menghapus data absensi', 'module' => 'kepegawaian', 'created_at' => $now, 'updated_at' => $now],
 
             // ============================================
+            // 3b. KEPEGAWAIAN - ATTENDANCE (kode AttendanceController memakai nama ini)
+            // ============================================
+            ['name' => 'attendance.manage-all', 'display_name' => 'Kelola Semua Attendance', 'description' => 'Dapat melihat, approve, edit, dan hapus attendance seluruh pegawai', 'module' => 'kepegawaian', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'attendance.own', 'display_name' => 'Absensi Diri Sendiri', 'description' => 'Dapat melakukan check-in/check-out & melihat riwayat absensi sendiri', 'module' => 'kepegawaian', 'created_at' => $now, 'updated_at' => $now],
+
+            // ============================================
             // 4. KEPEGAWAIAN - JADWAL (4 permissions)
             // ============================================
             ['name' => 'jadwal.view', 'display_name' => 'Lihat Jadwal', 'description' => 'Dapat melihat jadwal kerja', 'module' => 'kepegawaian', 'created_at' => $now, 'updated_at' => $now],
@@ -93,6 +99,40 @@ class PermissionsTableSeeder extends Seeder
             // ============================================
             ['name' => 'settings.view', 'display_name' => 'Lihat Pengaturan', 'description' => 'Dapat melihat pengaturan sistem', 'module' => 'settings', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'settings.update', 'display_name' => 'Edit Pengaturan', 'description' => 'Dapat mengubah pengaturan sistem', 'module' => 'settings', 'created_at' => $now, 'updated_at' => $now],
+
+            // ============================================
+            // 11. BARBERSHOP - BARBER (4 permissions)
+            // ============================================
+            ['name' => 'barber.view', 'display_name' => 'Lihat Barber', 'description' => 'Dapat melihat daftar barber', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'barber.create', 'display_name' => 'Tambah Barber', 'description' => 'Dapat menambah barber baru', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'barber.update', 'display_name' => 'Edit Barber', 'description' => 'Dapat mengedit data barber', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'barber.delete', 'display_name' => 'Hapus Barber', 'description' => 'Dapat menghapus barber', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+
+            // ============================================
+            // 12. BARBERSHOP - LAYANAN (4 permissions)
+            // ============================================
+            ['name' => 'layanan.view', 'display_name' => 'Lihat Layanan', 'description' => 'Dapat melihat daftar layanan', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'layanan.create', 'display_name' => 'Tambah Layanan', 'description' => 'Dapat menambah layanan baru', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'layanan.update', 'display_name' => 'Edit Layanan', 'description' => 'Dapat mengedit data layanan', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'layanan.delete', 'display_name' => 'Hapus Layanan', 'description' => 'Dapat menghapus layanan', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+
+            // ============================================
+            // 13. BARBERSHOP - GALERI (3 permissions)
+            // ============================================
+            ['name' => 'galeri.view', 'display_name' => 'Lihat Galeri', 'description' => 'Dapat melihat galeri foto', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'galeri.create', 'display_name' => 'Upload Galeri', 'description' => 'Dapat upload foto ke galeri', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'galeri.delete', 'display_name' => 'Hapus Galeri', 'description' => 'Dapat menghapus foto galeri', 'module' => 'barbershop', 'created_at' => $now, 'updated_at' => $now],
+
+            // ============================================
+            // 14. PESANAN / ORDER (2 permissions)
+            // ============================================
+            ['name' => 'order.view', 'display_name' => 'Lihat Pesanan', 'description' => 'Dapat melihat daftar pesanan customer', 'module' => 'pesanan', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'order.manage', 'display_name' => 'Kelola Pesanan', 'description' => 'Dapat mengubah status pesanan & verifikasi pembayaran', 'module' => 'pesanan', 'created_at' => $now, 'updated_at' => $now],
+
+            // ============================================
+            // 15. BACKUP & RESTORE (1 permission - sangat sensitif)
+            // ============================================
+            ['name' => 'backup.manage', 'display_name' => 'Kelola Backup', 'description' => 'Dapat membuat, mengunduh, menghapus, dan RESTORE backup database', 'module' => 'settings', 'created_at' => $now, 'updated_at' => $now],
         ];
 
         // Insert permissions
@@ -106,6 +146,7 @@ class PermissionsTableSeeder extends Seeder
         $this->command->info('1. User Management:    4 permissions');
         $this->command->info('2. Pegawai:            4 permissions');
         $this->command->info('3. Absensi:            4 permissions');
+        $this->command->info('3b. Attendance:        2 permissions');
         $this->command->info('4. Jadwal:             4 permissions');
         $this->command->info('5. Gaji:               3 permissions');
         $this->command->info('6. Aset:               4 permissions');
@@ -113,7 +154,12 @@ class PermissionsTableSeeder extends Seeder
         $this->command->info('8. Produk:             4 permissions');
         $this->command->info('9. Pelaporan:          3 permissions');
         $this->command->info('10. Settings:          2 permissions');
+        $this->command->info('11. Barber:            4 permissions');
+        $this->command->info('12. Layanan:           4 permissions');
+        $this->command->info('13. Galeri:            3 permissions');
+        $this->command->info('14. Pesanan:           2 permissions');
+        $this->command->info('15. Backup:            1 permission');
         $this->command->info('───────────────────────────');
-        $this->command->info('TOTAL:                38 permissions');
+        $this->command->info('TOTAL:                50 permissions');
     }
 }

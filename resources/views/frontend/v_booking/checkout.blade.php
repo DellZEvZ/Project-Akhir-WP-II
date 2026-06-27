@@ -5,6 +5,11 @@
 <section class="py-5" style="background:#f4f4f4;min-height:70vh;">
     <div class="container">
         <h3 class="font-head mb-4">CHECKOUT</h3>
+
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
         <form action="{{ route('booking.confirm') }}" method="POST">
             @csrf
             <div class="row g-4">
@@ -26,7 +31,7 @@
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label small">Pilih Barber <span class="text-danger">*</span></label>
-                                        <select name="barber_id" class="form-select @error('barber_id') is-invalid @enderror" required>
+                                        <select name="barber_id" id="barber_id" class="form-select @error('barber_id') is-invalid @enderror" required>
                                             <option value="">-- Pilih Barber --</option>
                                             @foreach ($barbers as $barber)
                                                 <option value="{{ $barber->id }}" {{ old('barber_id') == $barber->id ? 'selected' : '' }}>
@@ -86,32 +91,45 @@
 
 @push('scripts')
 <script>
-    const tgl = document.getElementById('tanggal_booking');
-    const jam = document.getElementById('jam_booking');
-    const info = document.getElementById('slotInfo');
+    const tgl    = document.getElementById('tanggal_booking');
+    const jam    = document.getElementById('jam_booking');
+    const barber = document.getElementById('barber_id');
+    const info   = document.getElementById('slotInfo');
     let takenSlots = [];
 
     async function loadSlots() {
         if (!tgl || !tgl.value || !info) return;
+
+        if (!barber || !barber.value) {
+            info.innerHTML = '<span class="text-muted"><i class="bi bi-info-circle"></i> Pilih barber dulu untuk melihat jam yang tersedia.</span>';
+            takenSlots = [];
+            checkJam();
+            return;
+        }
+
         try {
-            const res = await fetch('{{ route('booking.slots') }}?tanggal=' + tgl.value, { headers: { 'Accept': 'application/json' } });
+            const url = '{{ route('booking.slots') }}?tanggal=' + tgl.value + '&barber_id=' + barber.value;
+            const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
             takenSlots = (await res.json()).taken || [];
+            const namaBarber = barber.options[barber.selectedIndex].text;
             info.innerHTML = takenSlots.length
-                ? '<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Jam penuh pada tanggal ini: <strong>' + takenSlots.join(', ') + '</strong></span>'
-                : '<span class="text-success"><i class="bi bi-check-circle"></i> Semua jam masih tersedia.</span>';
+                ? '<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Jam penuh untuk ' + namaBarber + ': <strong>' + takenSlots.join(', ') + '</strong></span>'
+                : '<span class="text-success"><i class="bi bi-check-circle"></i> Semua jam tersedia untuk ' + namaBarber + '.</span>';
             checkJam();
         } catch (e) {}
     }
     function checkJam() {
         if (!jam || !jam.value) return;
         if (takenSlots.includes(jam.value)) {
-            info.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Jam <strong>' + jam.value + '</strong> sudah dibooking pelanggan lain. Pilih jam lain.</span>';
-            jam.setCustomValidity('Jam sudah penuh');
+            const namaBarber = barber && barber.value ? barber.options[barber.selectedIndex].text : 'Barber ini';
+            info.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> ' + namaBarber + ' sudah dibooking jam <strong>' + jam.value + '</strong>. Pilih jam lain atau barber lain.</span>';
+            jam.setCustomValidity('Jam sudah penuh untuk barber ini');
         } else {
             jam.setCustomValidity('');
         }
     }
     tgl?.addEventListener('change', loadSlots);
+    barber?.addEventListener('change', loadSlots);
     jam?.addEventListener('input', checkJam);
     loadSlots();
 </script>

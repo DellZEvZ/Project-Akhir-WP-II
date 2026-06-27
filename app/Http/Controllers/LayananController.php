@@ -5,11 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Layanan;
 use App\Helpers\ImageHelper;
+use App\Traits\HasPermissionCheck;
 
 class LayananController extends Controller
 {
+    use HasPermissionCheck;
+
     public function index(Request $request)
     {
+        if ($response = $this->checkPermission('layanan.view', 'Anda tidak memiliki izin untuk melihat data layanan.')) {
+            return $response;
+        }
+
         $query = Layanan::query();
 
         if ($request->filled('status')) {
@@ -34,11 +41,19 @@ class LayananController extends Controller
 
     public function create()
     {
+        if ($response = $this->checkPermission('layanan.create', 'Anda tidak memiliki izin untuk menambah layanan.')) {
+            return $response;
+        }
+
         return view('backend.v_layanan.create', ['judul' => 'Tambah Layanan']);
     }
 
     public function store(Request $request)
     {
+        if ($response = $this->checkPermission('layanan.create', 'Anda tidak memiliki izin untuk menambah layanan.')) {
+            return $response;
+        }
+
         $request->validate([
             'nama_layanan'  => 'required|string|max:100',
             'deskripsi'     => 'nullable|string',
@@ -73,6 +88,10 @@ class LayananController extends Controller
 
     public function edit(Layanan $layanan)
     {
+        if ($response = $this->checkPermission('layanan.update', 'Anda tidak memiliki izin untuk mengubah data layanan.')) {
+            return $response;
+        }
+
         return view('backend.v_layanan.edit', [
             'judul'   => 'Edit Layanan',
             'layanan' => $layanan,
@@ -81,6 +100,10 @@ class LayananController extends Controller
 
     public function update(Request $request, Layanan $layanan)
     {
+        if ($response = $this->checkPermission('layanan.update', 'Anda tidak memiliki izin untuk mengubah data layanan.')) {
+            return $response;
+        }
+
         $request->validate([
             'nama_layanan'  => 'required|string|max:100',
             'deskripsi'     => 'nullable|string',
@@ -110,6 +133,10 @@ class LayananController extends Controller
 
     public function destroy(Layanan $layanan)
     {
+        if ($response = $this->checkPermission('layanan.delete', 'Anda tidak memiliki izin untuk menghapus layanan.')) {
+            return $response;
+        }
+
         if ($layanan->foto) {
             ImageHelper::deleteImage($layanan->foto, 'img-layanan');
         }

@@ -281,11 +281,13 @@ class BookingController extends Controller
         }
 
         // Cegah tabrakan jadwal: slot (tanggal + jam) tidak boleh dipakai
-        // booking aktif milik pelanggan lain.
-        if ($order->has_layanan && $this->slotTaken($request->tanggal_booking, $request->jam_booking, $order->id)) {
+        // booking aktif lain untuk BARBER yang sama.
+        if ($order->has_layanan && $this->slotTaken($request->tanggal_booking, $request->jam_booking, $request->barber_id, $order->id)) {
+            $barberNama = \App\Models\Barber::find($request->barber_id)->nama ?? 'Barber ini';
             return back()->withInput()->with('error',
-                'Maaf, jadwal ' . $request->tanggal_booking . ' jam ' . $request->jam_booking .
-                ' sudah dibooking pelanggan lain. Silakan pilih jam lain.');
+                "{$barberNama} sudah dibooking pada jam {$request->jam_booking} tanggal " .
+                \Carbon\Carbon::parse($request->tanggal_booking)->format('d M Y') .
+                '. Silakan pilih jam lain atau barber lain.');
         }
 
         $order->update([
@@ -306,14 +308,14 @@ class BookingController extends Controller
     }
 
     /**
-     * Cek apakah slot jadwal (tanggal + jam) sudah dipakai booking aktif lain.
-     * Slot penuh bila ada Order jenis booking berstatus confirmed/done pada
-     * tanggal & jam sama (selain order ini).
+     * Cek apakah slot jadwal (tanggal + jam) sudah dipakai booking aktif lain
+     * untuk BARBER yang sama. Barber berbeda boleh melayani jam yang sama.
      */
-    private function slotTaken($tanggal, $jam, $excludeOrderId): bool
+    private function slotTaken($tanggal, $jam, $barberId, $excludeOrderId): bool
     {
         return Order::where('jenis', 'booking')
             ->whereIn('status', ['confirmed', 'done'])
+            ->where('barber_id', $barberId)
             ->where('tanggal_booking', $tanggal)
             ->where('jam_booking', $jam)
             ->where('id', '!=', $excludeOrderId)
@@ -321,16 +323,23 @@ class BookingController extends Controller
     }
 
     /**
-     * Daftar jam yang sudah penuh pada tanggal tertentu (JSON, untuk checkout).
+     * Daftar jam yang sudah penuh pada tanggal tertentu UNTUK BARBER TERTENTU
+     * (JSON, untuk checkout). Barber lain tidak memengaruhi ketersediaan jam ini.
      */
     public function slots(Request $request)
     {
-        $tanggal = $request->get('tanggal');
+        $tanggal  = $request->get('tanggal');
+        $barberId = $request->get('barber_id');
 
-        $taken = Order::where('jenis', 'booking')
+        $query = Order::where('jenis', 'booking')
             ->whereIn('status', ['confirmed', 'done'])
-            ->whereDate('tanggal_booking', $tanggal)
-            ->get()
+            ->whereDate('tanggal_booking', $tanggal);
+
+        if ($barberId) {
+            $query->where('barber_id', $barberId);
+        }
+
+        $taken = $query->get()
             ->map(fn ($o) => $o->jam_booking ? \Carbon\Carbon::parse($o->jam_booking)->format('H:i') : null)
             ->filter()->unique()->values();
 

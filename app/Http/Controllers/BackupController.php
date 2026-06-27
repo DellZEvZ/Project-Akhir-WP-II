@@ -8,9 +8,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
 use App\Helpers\ActivityLogger;
+use App\Traits\HasPermissionCheck;
 
 class BackupController extends Controller
 {
+    use HasPermissionCheck;
+
     protected $backupPath;
 
     public function __construct()
@@ -29,6 +32,10 @@ class BackupController extends Controller
      */
     public function index()
     {
+        if ($response = $this->checkPermission('backup.manage', 'Anda tidak memiliki izin untuk mengakses backup & restore.')) {
+            return $response;
+        }
+
         // Get all backup files
         $backups = [];
         $files = File::files($this->backupPath);
@@ -69,6 +76,10 @@ class BackupController extends Controller
      */
     public function create()
     {
+        if ($response = $this->checkPermission('backup.manage', 'Anda tidak memiliki izin untuk membuat backup.')) {
+            return $response;
+        }
+
         try {
             $timestamp = date('Y-m-d_His');
             $backupName = "backup_{$timestamp}";
@@ -272,6 +283,10 @@ class BackupController extends Controller
      */
     public function download($filename)
     {
+        if ($response = $this->checkPermission('backup.manage', 'Anda tidak memiliki izin untuk mengunduh backup.')) {
+            return $response;
+        }
+
         $filePath = $this->backupPath . '/' . $filename;
 
         if (!File::exists($filePath)) {
@@ -291,6 +306,10 @@ class BackupController extends Controller
      */
     public function destroy($filename)
     {
+        if ($response = $this->checkPermission('backup.manage', 'Anda tidak memiliki izin untuk menghapus backup.')) {
+            return $response;
+        }
+
         $filePath = $this->backupPath . '/' . $filename;
 
         if (!File::exists($filePath)) {
@@ -314,6 +333,10 @@ class BackupController extends Controller
      */
     public function restore(Request $request, $filename)
     {
+        if ($response = $this->checkPermission('backup.manage', 'Anda tidak memiliki izin untuk melakukan restore database.')) {
+            return $response;
+        }
+
         try {
             $filePath = $this->backupPath . '/' . $filename;
 
@@ -537,6 +560,10 @@ class BackupController extends Controller
      */
     public function upload(Request $request)
     {
+        if ($response = $this->checkPermission('backup.manage', 'Anda tidak memiliki izin untuk mengupload file backup.')) {
+            return $response;
+        }
+
         $request->validate([
             'backup_file' => 'required|file|mimes:zip|max:512000', // max 500MB
         ], [

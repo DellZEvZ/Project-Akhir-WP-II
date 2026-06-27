@@ -57,6 +57,14 @@ class RolesTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+            [
+                'name' => 'barber',
+                'display_name' => 'Barber',
+                'description' => 'Akun untuk barber/pegawai operasional. Hanya bisa melakukan absensi (check-in/check-out) sendiri, tidak memiliki akses ke modul backend lainnya',
+                'is_active' => true,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ];
 
         DB::table('roles')->insert($roles);

@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             
             // 2. Seed users (setelah roles ada)
             UserSeeder::class,
-            
+            BarberUserSeeder::class,
+
             // 3. Data Master lainnya
             PegawaiSeeder::class,
             AsetSeeder::class,
@@ -43,5 +44,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Default Login Credentials:');
         $this->command->info('Email: superadmin@gmail.com');
         $this->command->info('Password: P@55word');
+        $this->command->info('');
+        $this->command->info('Barber Login (akses terbatas ke halaman Absensi):');
+        $this->command->info('Email: barber1@gmail.com | Password: P@55word');
     }
 }

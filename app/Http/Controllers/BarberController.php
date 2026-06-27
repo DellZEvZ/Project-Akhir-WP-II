@@ -5,11 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Barber;
 use App\Helpers\ImageHelper;
+use App\Traits\HasPermissionCheck;
 
 class BarberController extends Controller
 {
+    use HasPermissionCheck;
+
     public function index(Request $request)
     {
+        if ($response = $this->checkPermission('barber.view', 'Anda tidak memiliki izin untuk melihat data barber.')) {
+            return $response;
+        }
+
         $query = Barber::query();
 
         if ($request->filled('status')) {
@@ -35,11 +42,19 @@ class BarberController extends Controller
 
     public function create()
     {
+        if ($response = $this->checkPermission('barber.create', 'Anda tidak memiliki izin untuk menambah barber.')) {
+            return $response;
+        }
+
         return view('backend.v_barber.create', ['judul' => 'Tambah Barber']);
     }
 
     public function store(Request $request)
     {
+        if ($response = $this->checkPermission('barber.create', 'Anda tidak memiliki izin untuk menambah barber.')) {
+            return $response;
+        }
+
         $request->validate([
             'nama'              => 'required|string|max:100',
             'spesialisasi'      => 'required|string|max:100',
@@ -74,6 +89,10 @@ class BarberController extends Controller
 
     public function edit(Barber $barber)
     {
+        if ($response = $this->checkPermission('barber.update', 'Anda tidak memiliki izin untuk mengubah data barber.')) {
+            return $response;
+        }
+
         return view('backend.v_barber.edit', [
             'judul'  => 'Edit Barber',
             'barber' => $barber,
@@ -82,6 +101,10 @@ class BarberController extends Controller
 
     public function update(Request $request, Barber $barber)
     {
+        if ($response = $this->checkPermission('barber.update', 'Anda tidak memiliki izin untuk mengubah data barber.')) {
+            return $response;
+        }
+
         $request->validate([
             'nama'              => 'required|string|max:100',
             'spesialisasi'      => 'required|string|max:100',
@@ -112,6 +135,10 @@ class BarberController extends Controller
 
     public function destroy(Barber $barber)
     {
+        if ($response = $this->checkPermission('barber.delete', 'Anda tidak memiliki izin untuk menghapus barber.')) {
+            return $response;
+        }
+
         if ($barber->foto) {
             ImageHelper::deleteImage($barber->foto, 'img-barber');
         }

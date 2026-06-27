@@ -17,6 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission'  => \App\Http\Middleware\CheckPermission::class,
             'is.customer' => \App\Http\Middleware\IsCustomer::class,
         ]);
+
+        // Kunci akun barber agar hanya bisa mengakses halaman absensi sendiri.
+        // Dipasang di grup 'web' (bukan stack global) agar berjalan SETELAH
+        // session & auth state ter-resolve, supaya Auth::user() sudah terisi.
+        $middleware->web(append: [
+            \App\Http\Middleware\RedirectBarberToAttendance::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

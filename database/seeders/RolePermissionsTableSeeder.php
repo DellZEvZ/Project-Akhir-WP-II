@@ -93,6 +93,17 @@ class RolePermissionsTableSeeder extends Seeder
                 
                 // Settings - View Only
                 'settings.view', 'settings.update',
+
+                // Barbershop - Full Access
+                'barber.view', 'barber.create', 'barber.update', 'barber.delete',
+                'layanan.view', 'layanan.create', 'layanan.update', 'layanan.delete',
+                'galeri.view', 'galeri.create', 'galeri.delete',
+
+                // Pesanan - Full Access
+                'order.view', 'order.manage',
+
+                // Backup - Full Access (sensitif, hanya admin & super-admin)
+                'backup.manage',
             ];
 
             $adminPermissions = [];
@@ -249,6 +260,37 @@ class RolePermissionsTableSeeder extends Seeder
             $this->command->error('✗ Viewer role not found!');
         }
 
+        // ============================================
+        // BARBER - Hanya Absensi Diri Sendiri (1 permission)
+        // ============================================
+        if ($roles->has('barber')) {
+            $barberPermissionNames = [
+                'attendance.own',
+            ];
+
+            $barberPermissions = [];
+            $foundCount = 0;
+            foreach ($barberPermissionNames as $permName) {
+                $permId = $getPermissionId($permName);
+                if ($permId) {
+                    $barberPermissions[] = [
+                        'role_id' => $roles['barber']->id,
+                        'permission_id' => $permId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                    $foundCount++;
+                }
+            }
+
+            if (!empty($barberPermissions)) {
+                DB::table('role_permissions')->insert($barberPermissions);
+                $this->command->info("✓ Barber: {$foundCount} permission (SELF ATTENDANCE ONLY)");
+            }
+        } else {
+            $this->command->error('✗ Barber role not found!');
+        }
+
         $this->command->info('');
         $this->command->info('=== Role Permissions Assignment Completed ===');
         
@@ -280,6 +322,9 @@ class RolePermissionsTableSeeder extends Seeder
                     break;
                 case 'viewer':
                     $description = '(View Only)';
+                    break;
+                case 'barber':
+                    $description = '(Self Attendance Only)';
                     break;
             }
             
