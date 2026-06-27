@@ -49,17 +49,22 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's#\/var\/www\/html#${APACHE_DOCUMENT_ROOT}#g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's#\/var\/www\/html#${APACHE_DOCUMENT_ROOT}#g' /etc/apache2/apache2.conf
 
-# Optimize Composer autoloader.
-# Catatan: dump-autoload memicu hook post-autoload-dump (artisan package:discover),
-# yang butuh app Laravel bisa di-bootstrap (APP_KEY & config dasar). Karena .env
-# tidak ikut di-copy ke image (lihat .dockerignore), pakai .env.example sebagai
-# konteks sementara hanya untuk proses build ini; .env asli tetap di-inject saat
-# container berjalan (lewat env vars / volume / entrypoint sesuai platform deploy).
-RUN cp .env.example .env \
-    && php artisan key:generate --force \
-    && composer dump-autoload --optimize \
-    && rm .env
+# Generate autoloader dasar SAJA (--no-scripts) saat build. Ini tidak butuh .env
+# atau APP_KEY sama sekali, jadi aman dijalankan tanpa konteks aplikasi penuh.
+# Optimisasi penuh (--optimize) dan hook Laravel (package:discover, config:cache,
+# dst.) dijalankan oleh docker-entrypoint.sh saat container START, bukan saat
+# build — di titik itu .env produksi sudah ter-inject oleh platform deploy.
+RUN composer dump-autoload --no-scripts
+
+# Copy & siapkan entrypoint script.
+# sed menghapus carriage return (\r) untuk berjaga-jaga kalau file ini
+# tersimpan dengan line-ending CRLF (umum terjadi di editor/Git Windows),
+# karena #!/bin/sh akan gagal parse kalau ada \r tersisa di shebang line.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 80
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
