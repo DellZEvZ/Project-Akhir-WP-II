@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../services/catalog_service.dart';
+import '../services/cart_service.dart';
 import '../widgets/katalog_card.dart';
 import 'detail_produk.dart';
+import 'cart_page.dart';
 
 /// Halaman Produk (StatefulWidget) — data dari API (fallback statis) + pencarian.
 class ProdukPage extends StatefulWidget {
@@ -14,11 +16,24 @@ class ProdukPage extends StatefulWidget {
 class _ProdukPageState extends State<ProdukPage> {
   String _keyword = '';
   late Future<List<Map<String, dynamic>>> _future;
+  // Notifier agar badge keranjang update otomatis
+  final ValueNotifier<int> _cartCount = ValueNotifier(0);
 
   @override
   void initState() {
     super.initState();
     _future = CatalogService.fetchProduk();
+    _cartCount.value = CartService.instance.totalItem;
+  }
+
+  @override
+  void dispose() {
+    _cartCount.dispose();
+    super.dispose();
+  }
+
+  void _refreshCart() {
+    _cartCount.value = CartService.instance.totalItem;
   }
 
   @override
@@ -27,6 +42,27 @@ class _ProdukPageState extends State<ProdukPage> {
       appBar: AppBar(
         title: const Text('Produk'),
         automaticallyImplyLeading: false,
+        actions: [
+          ValueListenableBuilder<int>(
+            valueListenable: _cartCount,
+            builder: (context, count, _) {
+              return IconButton(
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CartPage()),
+                  );
+                  _refreshCart(); // update badge setelah kembali dari cart
+                },
+                icon: Badge(
+                  label: Text('$count'),
+                  isLabelVisible: count > 0,
+                  child: const Icon(Icons.shopping_cart_outlined),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -82,10 +118,13 @@ class _ProdukPageState extends State<ProdukPage> {
                       item: produk,
                       icon: Icons.shopping_bag,
                       subtitle: produk['kategori']?.toString(),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => DetailProduk(produk: produk)),
-                      ),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => DetailProduk(produk: produk)),
+                        );
+                        _refreshCart(); // badge update setelah kembali dari detail
+                      },
                     );
                   },
                 );

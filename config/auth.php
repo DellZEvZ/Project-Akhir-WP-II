@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // Guard untuk customer mobile (Sanctum token-based)
+        'customer' => [
+            'driver'   => 'sanctum',
+            'provider' => 'customers',
+        ],
     ],
 
     /*
@@ -63,6 +68,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+        // Provider untuk model Customer (tabel customers)
+        'customers' => [
+            'driver' => 'eloquent',
+            'model'  => App\Models\Customer::class,
         ],
 
         // 'users' => [

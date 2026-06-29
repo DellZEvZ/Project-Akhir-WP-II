@@ -10,6 +10,7 @@ class BookingSummary extends StatelessWidget {
   final TimeOfDay jam;
   final String catatan;
   final int? orderId; // tidak null jika booking tersimpan di server
+  final String? barberNama;
 
   const BookingSummary({
     super.key,
@@ -20,6 +21,7 @@ class BookingSummary extends StatelessWidget {
     required this.jam,
     required this.catatan,
     this.orderId,
+    this.barberNama,
   });
 
   Widget _row(String label, String value) {
@@ -74,6 +76,7 @@ class BookingSummary extends StatelessWidget {
                   _row('Layanan', layanan['nama']),
                   _row('Harga', 'Rp ${layanan['harga']}'),
                   _row('Durasi', '${layanan['durasi']} menit'),
+                  if (barberNama != null) _row('Barber', barberNama!),
                   const Divider(),
                   _row('Nama', nama),
                   _row('No. HP', hp),

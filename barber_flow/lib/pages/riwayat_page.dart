@@ -92,7 +92,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
                           children: [
                             Text('${isProduk ? 'Pesanan' : 'Booking'} #${o['id']}',
                                 style: const TextStyle(fontWeight: FontWeight.bold)),
-                            Text(_rp(o['total_harga']),
+                            Text(_rp(o['total_akhir'] ?? o['total_harga']),
                                 style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
                           ],
                         ),
@@ -103,12 +103,21 @@ class _RiwayatPageState extends State<RiwayatPage> {
                         if (o['tanggal_booking'] != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 6),
-                            child: Text('📅 ${o['tanggal_booking']}   🕒 ${o['jam_booking'] ?? '-'} WIB',
+                            child: Text(
+                                '📅 ${o['tanggal_booking']}   🕒 ${o['jam_booking'] ?? '-'} WIB'
+                                '${o['barber'] != null ? '   ✂️ ${o['barber']['nama']}' : ''}',
                                 style: const TextStyle(fontSize: 12, color: Colors.grey)),
                           ),
                         const SizedBox(height: 6),
                         ...items.map((it) => Text('• ${it['nama']} (${it['qty']}x)  ${_rp(it['harga'])}',
                             style: const TextStyle(fontSize: 13))),
+                        if ((o['biaya_ongkir'] ?? 0) > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                                '• Ongkos Kirim (${o['kurir'] ?? ''} ${o['layanan_ongkir'] ?? ''})  ${_rp(o['biaya_ongkir'])}',
+                                style: const TextStyle(fontSize: 13)),
+                          ),
                         const SizedBox(height: 8),
                         Row(children: [
                           if (lunas)
@@ -124,7 +133,10 @@ class _RiwayatPageState extends State<RiwayatPage> {
                                 MaterialPageRoute(
                                   builder: (_) => PaymentPage(
                                     orderId: o['id'] as int,
-                                    total: o['total_harga'] as int,
+                                    total: (() {
+                                      final v = o['total_akhir'] ?? o['total_harga'] ?? 0;
+                                      return v is int ? v : (v as num).toInt();
+                                    })(),
                                     namaLayanan: namaPertama,
                                   ),
                                 ),

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../services/auth_service.dart';
 import '../services/booking_service.dart';
+import '../services/catalog_service.dart';
 import 'booking_summary.dart';
 
-/// Form pemesanan sederhana (StatefulWidget) dengan validasi & date picker.
+/// Form pemesanan layanan. Wajib pilih barber agar sistem bisa mencegah
+/// bentrok jadwal per-barber (barber A & B boleh dibooking di jam yang
+/// sama, tapi barber yang sama tidak boleh dobel).
 class BookingForm extends StatefulWidget {
   final Map<String, dynamic> layanan;
   const BookingForm({super.key, required this.layanan});
@@ -21,6 +25,25 @@ class _BookingFormState extends State<BookingForm> {
   DateTime? _tanggal;
   TimeOfDay? _jam;
   bool _loading = false;
+
+  late Future<List<Map<String, dynamic>>> _barberFuture;
+  Map<String, dynamic>? _barberTerpilih;
+
+  @override
+  void initState() {
+    super.initState();
+    _barberFuture = CatalogService.fetchBarber();
+    _prefillFromProfile();
+  }
+
+  Future<void> _prefillFromProfile() async {
+    final data = await AuthService.me();
+    if (!mounted || data == null) return;
+    setState(() {
+      _namaCtrl.text = data['nama']?.toString() ?? '';
+      _hpCtrl.text = data['no_hp']?.toString() ?? '';
+    });
+  }
 
   @override
   void dispose() {
@@ -57,38 +80,54 @@ class _BookingFormState extends State<BookingForm> {
       );
       return;
     }
+    if (_barberTerpilih == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pilih barber terlebih dahulu.')),
+      );
+      return;
+    }
 
     setState(() => _loading = true);
 
     int? orderId;
 
-    // Jika layanan punya id (dari API) → simpan booking ke server.
     final id = widget.layanan['id'];
-    if (id is int) {
+    final barberId = _barberTerpilih!['id'];
+    if (id is int && barberId is int) {
       try {
         final tgl = '${_tanggal!.year}-${_tanggal!.month.toString().padLeft(2, '0')}-${_tanggal!.day.toString().padLeft(2, '0')}';
         final jam = '${_jam!.hour.toString().padLeft(2, '0')}:${_jam!.minute.toString().padLeft(2, '0')}';
         final result = await BookingService.createBooking(
           layananIds: [id],
+          barberId: barberId,
           tanggal: tgl,
           jam: jam,
           catatan: _catatanCtrl.text,
+          layananNama: widget.layanan['nama']?.toString() ?? '',
+          layananHarga: (widget.layanan['harga'] is int)
+              ? widget.layanan['harga'] as int
+              : int.tryParse('${widget.layanan['harga']}') ?? 0,
+          layananDurasi: (widget.layanan['durasi'] is int)
+              ? widget.layanan['durasi'] as int
+              : int.tryParse('${widget.layanan['durasi']}') ?? 0,
+          barberNama: _barberTerpilih!['nama']?.toString() ?? '',
         );
         orderId = result['id'] as int?;
       } catch (e) {
         if (!mounted) return;
         setState(() => _loading = false);
+        // Pesan dari server sudah jelas (mis. bentrok jadwal per-barber),
+        // tampilkan langsung tanpa dibungkus ulang.
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal menyimpan booking: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('$e'), backgroundColor: Colors.red),
         );
         return;
       }
     } else {
-      // Kasus data statis (fallback)
       if (!mounted) return;
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: Data layanan tidak valid.')),
+        const SnackBar(content: Text('Error: Data layanan atau barber tidak valid.')),
       );
       return;
     }
@@ -107,6 +146,7 @@ class _BookingFormState extends State<BookingForm> {
           jam: _jam!,
           catatan: _catatanCtrl.text,
           orderId: orderId,
+          barberNama: _barberTerpilih!['nama']?.toString(),
         ),
       ),
     );
@@ -134,7 +174,7 @@ class _BookingFormState extends State<BookingForm> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.content_cut, color: AppColors.gold),
+                  const Icon(Icons.content_cut, color: AppColors.primary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -144,7 +184,7 @@ class _BookingFormState extends State<BookingForm> {
                             style: const TextStyle(
                                 color: Colors.white, fontWeight: FontWeight.bold)),
                         Text('Rp ${widget.layanan['harga']}',
-                            style: const TextStyle(color: AppColors.goldLight)),
+                            style: const TextStyle(color: Colors.white70)),
                       ],
                     ),
                   ),
@@ -152,6 +192,58 @@ class _BookingFormState extends State<BookingForm> {
               ),
             ),
             const SizedBox(height: 20),
+            const Text('Pilih Barber', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            const SizedBox(height: 8),
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: _barberFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                final daftarBarber = snapshot.data ?? [];
+                if (daftarBarber.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Text('Tidak ada barber tersedia saat ini.', style: TextStyle(color: Colors.red)),
+                  );
+                }
+                return Column(
+                  children: daftarBarber.map((b) {
+                    final selected = _barberTerpilih?['id'] == b['id'];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: selected ? AppColors.primary : Colors.grey.shade300,
+                          width: selected ? 2 : 1,
+                        ),
+                      ),
+                      child: ListTile(
+                        onTap: () => setState(() => _barberTerpilih = b),
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.dark,
+                          child: Text(
+                            (b['nama'] ?? '?').toString().substring(0, 1).toUpperCase(),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: Text(b['nama']?.toString() ?? 'Barber'),
+                        subtitle: Text(b['spesialisasi']?.toString() ?? '-'),
+                        trailing: Icon(
+                          selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                          color: selected ? AppColors.primary : Colors.grey,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _namaCtrl,
               decoration: const InputDecoration(

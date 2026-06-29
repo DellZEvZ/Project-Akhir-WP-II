@@ -1,13 +1,34 @@
 /// Konfigurasi aplikasi.
 ///
-/// Ganti [baseUrl] sesuai lingkungan:
-/// - HP fisik via USB : http://localhost:8000/api  (perlu `adb reverse tcp:8000 tcp:8000`)
-/// - Android Emulator : http://10.0.2.2:8000/api   (localhost host machine)
-/// - HP fisik (WiFi)  : http://IP-LAPTOP:8000/api  (mis. 192.168.1.5)
-/// - Windows desktop  : http://127.0.0.1:8000/api
+/// Pilih [baseUrl] sesuai cara kamu menjalankan app:
+///
+/// ─────────────────────────────────────────────────────────────────
+/// MODE 1 — HP FISIK via USB (direkomendasikan, paling stabil)
+///   Jalankan di CMD/terminal laptop: adb reverse tcp:8000 tcp:8000
+///   lalu set:
+///     baseUrl = 'http://localhost:8000/api'
+///
+/// MODE 2 — ANDROID EMULATOR (bawaan Android Studio)
+///   set:
+///     baseUrl = 'http://10.0.2.2:8000/api'
+///
+/// MODE 3 — HP FISIK via WiFi (laptop & HP satu jaringan WiFi)
+///   Cek IP laptop: ipconfig → cari IPv4 di adapter WiFi
+///   set:
+///     baseUrl = 'http://192.168.X.X:8000/api'
+///   PENTING: pastikan firewall Windows mengizinkan port 8000.
+///
+/// MODE 4 — Windows desktop (test di komputer yang sama)
+///   set:
+///     baseUrl = 'http://127.0.0.1:8000/api'
+/// ─────────────────────────────────────────────────────────────────
 class AppConfig {
-  static const String baseUrl = 'http://localhost:8000/api';
+  // ↓ Ganti sesuai mode yang dipakai saat ini
+  static const String baseUrl = 'http://localhost:8000/api'; // MODE 1 (USB)
+  // static const String baseUrl = 'http://10.0.2.2:8000/api';   // MODE 2 (Emulator)
+  // static const String baseUrl = 'http://192.168.1.X:8000/api'; // MODE 3 (WiFi) ← ganti IP
+  // static const String baseUrl = 'http://127.0.0.1:8000/api';  // MODE 4 (Desktop)
 
   /// Timeout permintaan HTTP (detik).
-  static const int timeoutSeconds = 8;
+  static const int timeoutSeconds = 15;
 }

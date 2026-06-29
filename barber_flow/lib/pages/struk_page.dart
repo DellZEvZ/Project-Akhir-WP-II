@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../theme.dart';
 
 /// Struk / bukti pembayaran (mengikuti tampilan struk website).
@@ -75,14 +77,67 @@ class StrukPage extends StatelessWidget {
                       Text(_rp(it['harga'] * it['qty']), style: const TextStyle(fontSize: 13)),
                     ]),
                   )),
+              if ((order['biaya_ongkir'] ?? 0) > 0)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Flexible(child: Text('Ongkos Kirim (${order['kurir'] ?? ''} ${order['layanan_ongkir'] ?? ''})', style: const TextStyle(fontSize: 13))),
+                    Text(_rp(order['biaya_ongkir']), style: const TextStyle(fontSize: 13)),
+                  ]),
+                ),
               dash,
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 const Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(_rp(order['total_harga']), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary)),
+                Text(_rp(order['total_akhir'] ?? order['total_harga']), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary)),
               ]),
               if (order['alamat_kirim'] != null) ...[
                 const SizedBox(height: 8),
-                _row('Kirim ke', order['alamat_kirim'].toString()),
+                _row('Kirim ke', '${order['alamat_kirim']}${order['kota_tujuan_label'] != null ? ', ${order['kota_tujuan_label']}' : ''}'),
+              ],
+              // QR Code hanya untuk booking layanan (bukan pesanan produk kiriman)
+              if (order['tanggal_booking'] != null) ...[
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 8),
+                const Text(
+                  'Scan QR ini untuk konfirmasi kedatangan',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 10),
+                Center(
+                  child: QrImageView(
+                    data: jsonEncode({
+                      'order_id': order['id'],
+                      'no_ref': order['no_ref'] ?? 'CASH-${order['id']}',
+                      'layanan': (order['items'] as List?)
+                              ?.map((i) => i['nama'])
+                              .join(', ') ??
+                          '-',
+                      'barber': order['barber']?['nama'] ?? '-',
+                      'jadwal':
+                          '${order['tanggal_booking'] ?? '-'} ${order['jam_booking'] ?? ''}',
+                      'status_bayar': order['status_bayar'] ?? '-',
+                      'total': order['total_akhir'] ?? order['total_harga'] ?? 0,
+                    }),
+                    version: QrVersions.auto,
+                    size: 180,
+                    eyeStyle: const QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                    dataModuleStyle: const QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Order #${order['id']} · ${order['barber']?['nama'] ?? '-'}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
               ],
               const SizedBox(height: 14),
               const Text('Terima kasih telah mempercayai Barber Flow.\nTunjukkan struk ini sebagai bukti pembayaran.',

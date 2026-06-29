@@ -25,6 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/booking',          [BookingApiController::class, 'index']);
     Route::post('/booking',         [BookingApiController::class, 'store']);
+    Route::post('/booking/produk',  [BookingApiController::class, 'storeProduk']);
     Route::get('/booking/{id}',     [BookingApiController::class, 'show']);
     Route::post('/booking/{id}/pay', [BookingApiController::class, 'pay']);
+
+    Route::get('/shipping/search',  [BookingApiController::class, 'searchShipping']);
+    Route::post('/shipping/cost',   [BookingApiController::class, 'shippingCost']);
 });
