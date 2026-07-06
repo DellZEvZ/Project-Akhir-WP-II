@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    images: dkr-reg.serenetia.com/dellzevz/project-akhir-wp-ii:latest
     container_name: pawp2_app
     restart: unless-stopped
     ports:
