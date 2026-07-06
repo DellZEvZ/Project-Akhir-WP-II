@@ -1,8 +1,10 @@
 import 'api_service.dart';
+import '../config/app_config.dart';
 
-/// Mode offline: ongkos kirim disimulasikan lokal tanpa RajaOngkir.
+/// Ongkos kirim. Mode ditentukan terpusat oleh [AppConfig.useBackend].
+/// Offline: kota & tarif disimulasikan lokal. Online: proxy RajaOngkir via API.
 class ShippingService {
-  static const bool _offlineMode = true;
+  static const bool _offlineMode = !AppConfig.useBackend;
 
   // Daftar kota simulasi untuk demo
   static const List<Map<String, dynamic>> _kotaDemo = [

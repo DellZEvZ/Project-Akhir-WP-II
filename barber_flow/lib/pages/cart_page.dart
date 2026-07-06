@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../services/cart_service.dart';
+import '../widgets/foto.dart';
 import 'shipping_page.dart';
 
 /// Halaman keranjang produk. Data diambil dari [CartService] (in-memory).
@@ -50,15 +51,14 @@ class _CartPageState extends State<CartPage> {
                           padding: const EdgeInsets.all(12),
                           child: Row(
                             children: [
-                              Container(
-                                width: 56,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  color: AppColors.dark,
-                                  borderRadius: BorderRadius.circular(8),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Foto(
+                                  url: item.produk['gambar']?.toString(),
+                                  width: 56,
+                                  height: 56,
+                                  fallbackIcon: Icons.shopping_bag,
                                 ),
-                                child: const Icon(Icons.shopping_bag,
-                                    color: AppColors.primary),
                               ),
                               const SizedBox(width: 12),
                               Expanded(

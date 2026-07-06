@@ -71,6 +71,7 @@ class CatalogApiController extends Controller
             'nama'      => $p->nama_produk,
             'harga'     => (int) $p->harga,
             'stok'      => $p->stok,
+            'berat'     => $p->berat,
             'kategori'  => $p->kategori->nama_kategori ?? '-',
             'deskripsi' => $p->detail,
             'gambar'    => $this->img('img-produk', $p->foto),

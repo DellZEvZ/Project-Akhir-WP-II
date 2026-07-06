@@ -16,19 +16,17 @@ class WelcomePage extends StatelessWidget {
           padding: const EdgeInsets.all(28),
           children: [
             const SizedBox(height: 60),
-            const Icon(Icons.content_cut, color: AppColors.primary, size: 90),
-            const SizedBox(height: 20),
-            const Text(
-              'BARBER FLOW',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Image.asset('assets/barber_logo.png', width: 180, height: 180),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 24),
             const Text(
               'Your Style, Your Flow',
               textAlign: TextAlign.center,

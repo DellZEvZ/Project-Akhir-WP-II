@@ -1,9 +1,10 @@
 import 'api_service.dart';
+import '../config/app_config.dart';
 
-/// Mode offline: booking disimpan in-memory selama sesi app berjalan.
-/// Data tidak hilang saat navigasi, tapi hilang saat app ditutup — cukup untuk demo.
+/// Booking. Mode ditentukan terpusat oleh [AppConfig.useBackend].
+/// Offline: disimpan in-memory selama sesi. Online: endpoint /booking (Sanctum).
 class BookingService {
-  static const bool _offlineMode = true;
+  static const bool _offlineMode = !AppConfig.useBackend;
 
   // In-memory storage untuk demo
   static int _nextId = 1;

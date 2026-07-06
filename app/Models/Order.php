@@ -83,7 +83,9 @@ class Order extends Model
             'belum'               => 'Belum Bayar',
             'menunggu_verifikasi' => 'Menunggu Verifikasi',
             'lunas'               => 'Lunas',
-            default               => $this->status_bayar,
+            // status_bayar bisa null untuk booking baru dari API mobile;
+            // kembalikan string default agar tidak melanggar return type ': string'.
+            default               => $this->status_bayar ?? 'Belum Bayar',
         };
     }
 }

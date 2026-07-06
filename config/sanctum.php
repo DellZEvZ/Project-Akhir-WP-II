@@ -34,7 +34,12 @@ return [
     |
     */
 
-    'guard' => ['web', 'customer'],
+    // Hanya guard berbasis session. JANGAN masukkan 'customer' di sini:
+    // guard 'customer' sendiri berdriver 'sanctum', sehingga memasukkannya
+    // membuat Sanctum memanggil dirinya sendiri → rekursi tak terhingga →
+    // stack overflow → PHP crash ("End of script output before headers", HTTP 500
+    // tanpa pesan). Auth token customer tetap jalan karena lewat bearer token.
+    'guard' => ['web'],
 
     /*
     |--------------------------------------------------------------------------

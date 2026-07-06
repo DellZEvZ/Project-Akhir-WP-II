@@ -123,7 +123,7 @@ class BookingApiController extends Controller
     {
         $request->validate([
             'items'              => 'required|array|min:1',
-            'items.*.produk_id'  => 'required|integer|exists:produks,id',
+            'items.*.produk_id'  => 'required|integer|exists:produk,id',
             'items.*.qty'        => 'required|integer|min:1',
             'alamat_kirim'       => 'required|string|max:500',
             'kota_tujuan_id'     => 'required|string',
@@ -250,7 +250,7 @@ class BookingApiController extends Controller
             return response()->json(['success' => true, 'data' => []]);
         }
 
-        $response = Http::withHeaders([
+        $response = Http::timeout(10)->connectTimeout(5)->withHeaders([
             'key' => config('services.rajaongkir.api_key'),
         ])->get(config('services.rajaongkir.base_url') . '/destination/domestic-destination', [
             'search' => $keyword,
@@ -274,7 +274,7 @@ class BookingApiController extends Controller
             'courier'     => 'required|string',
         ]);
 
-        $response = Http::asForm()->withHeaders([
+        $response = Http::asForm()->timeout(10)->connectTimeout(5)->withHeaders([
             'key' => config('services.rajaongkir.api_key'),
         ])->post(config('services.rajaongkir.base_url') . '/calculate/domestic-cost', [
             'origin'      => config('services.rajaongkir.origin'),

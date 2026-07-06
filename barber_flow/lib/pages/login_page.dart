@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme.dart';
 import '../services/auth_service.dart';
 import 'main_page.dart';
 
@@ -58,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(24),
           children: [
             const SizedBox(height: 10),
-            const Icon(Icons.account_circle, size: 80, color: AppColors.dark),
+            Image.asset('assets/barber_logo.png', height: 130),
             const SizedBox(height: 8),
             const Text(
               'Selamat Datang Kembali',

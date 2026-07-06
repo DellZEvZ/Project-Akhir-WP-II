@@ -25,7 +25,8 @@ class _BerandaPageState extends State<BerandaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BARBER FLOW'),
+        title: Image.asset('assets/barber_logo.png', height: 38),
+        centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(

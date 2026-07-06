@@ -1,10 +1,12 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_service.dart';
+import '../config/app_config.dart';
 
-/// Mode offline: auth disimulasikan lokal tanpa server.
-/// Login/register memakai SharedPreferences sebagai "database" sementara.
+/// Auth customer. Mode ditentukan terpusat oleh [AppConfig.useBackend].
+/// Offline: login/register disimulasikan via SharedPreferences.
+/// Online: memakai endpoint /login & /register (Sanctum token).
 class AuthService {
-  static const bool _offlineMode = true;
+  static const bool _offlineMode = !AppConfig.useBackend;
 
   static const _keyNama = 'offline_nama';
   static const _keyEmail = 'offline_email';

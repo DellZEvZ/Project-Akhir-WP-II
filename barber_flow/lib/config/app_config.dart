@@ -23,6 +23,18 @@
 ///     baseUrl = 'http://127.0.0.1:8000/api'
 /// ─────────────────────────────────────────────────────────────────
 class AppConfig {
+  /// SAKLAR TERPUSAT online/offline untuk SELURUH aplikasi.
+  ///
+  ///   true  → semua data (katalog, auth, booking) diambil dari backend
+  ///           Laravel lewat REST API. Ini "versi terhubung".
+  ///   false → mode demo tanpa server: data statis lokal, auth & booking
+  ///           disimulasikan (SharedPreferences / in-memory).
+  ///
+  /// Semua service (CatalogService, AuthService, BookingService) membaca
+  /// saklar ini — jadi tidak mungkin lagi setengah online / setengah offline
+  /// (penyebab utama 401 & data palsu pada versi sebelumnya).
+  static const bool useBackend = true;
+
   // ↓ Ganti sesuai mode yang dipakai saat ini
   static const String baseUrl = 'http://localhost:8000/api'; // MODE 1 (USB)
   // static const String baseUrl = 'http://10.0.2.2:8000/api';   // MODE 2 (Emulator)
