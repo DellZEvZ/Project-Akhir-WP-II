@@ -21,6 +21,13 @@ if [ -z "$APP_KEY" ]; then
     fi
 fi
 
+# Buat symlink public/storage -> storage/app/public agar file yang diunggah
+# (gambar barber/layanan/produk/galeri) dapat diakses lewat URL /storage/*.
+# Idempoten: hanya dibuat jika symlink belum ada, supaya aman di-restart.
+if [ ! -L public/storage ]; then
+    php artisan storage:link
+fi
+
 # Daftarkan ulang package discovery & optimisasi autoloader dengan konteks
 # environment yang sudah lengkap (ini yang gagal kalau dijalankan saat build).
 composer dump-autoload --optimize --no-interaction

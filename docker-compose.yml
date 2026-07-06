@@ -8,10 +8,14 @@ services:
     ports:
       - "8000:80"
     environment:
-      APP_NAME: ${APP_NAME:-Laravel}
-      APP_ENV: ${APP_ENV:-local}
-      APP_KEY: ${APP_KEY:-}
-      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_NAME: ${APP_NAME:-BarberFlow}
+      APP_ENV: ${APP_ENV:-production}
+      # APP_KEY di-set eksplisit agar konsisten antar restart/redeploy (kalau
+      # dibiarkan kosong, entrypoint akan generate key baru setiap container
+      # fresh sehingga session & data terenkripsi rusak). Untuk produksi nyata,
+      # override lewat environment variable platform deploy.
+      APP_KEY: ${APP_KEY:-base64:AMGr55gxQLgfvGdu5mulNDJysOE3fNLv0HVdUE9cQsA=}
+      APP_DEBUG: ${APP_DEBUG:-false}
       APP_URL: ${APP_URL:-http://localhost:8000}
 
       DB_CONNECTION: mysql
