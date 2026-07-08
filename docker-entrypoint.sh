@@ -56,7 +56,7 @@ php artisan view:cache
 echo "Menunggu koneksi database..."
 DB_READY=0
 for i in $(seq 1 15); do
-    if php artisan db:show > /dev/null 2>&1; then
+    if php -r '$dsn="mysql:host=".getenv("DB_HOST").";port=".(getenv("DB_PORT")?:"3306").";dbname=".getenv("DB_DATABASE"); new PDO($dsn, getenv("DB_USERNAME"), getenv("DB_PASSWORD"));' > /dev/null 2>&1; then
         DB_READY=1
         break
     fi
