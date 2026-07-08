@@ -7,6 +7,19 @@ set -e
 
 cd /var/www/html
 
+# Pastikan direktori runtime storage ada SEBELUM command apa pun yang meng-compile
+# view / meng-cache config. Subfolder framework di-exclude oleh .dockerignore
+# (tidak ikut ke image) dan volume storage yang kosong bisa menutupinya, sehingga
+# Blade gagal dengan "Please provide a valid cache path". Dibuat ulang di sini
+# (entrypoint berjalan setelah volume ter-mount) agar selalu tersedia & writable.
+mkdir -p \
+    storage/framework/views \
+    storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/logs \
+    bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+
 # Pastikan APP_KEY tersedia, baik lewat environment variable container
 # maupun lewat file .env (kalau platform deploy memakai cara itu).
 # Kalau dua-duanya kosong, generate satu secara otomatis supaya container
