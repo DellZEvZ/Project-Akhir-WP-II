@@ -1,10 +1,10 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile
     # Untuk deploy image hasil CI (bukan build lokal), ganti blok build di atas
-    # dengan: image: dkr-reg.serenetia.com/<owner>/<repo>:latest
+    image: dkr-reg.serenetia.com/dellzevz/project-akhir-wp-ii:latest
     container_name: pawp2_app
     restart: unless-stopped
     ports:
