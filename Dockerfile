@@ -25,6 +25,15 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql bcmath gd zip
 
+# Install ekstensi Redis (phpredis) via PECL. Diperlukan HANYA jika driver
+# cache/session/queue diarahkan ke redis (mis. REDIS eksternal). $PHPIZE_DEPS
+# adalah build-tools sementara yang langsung di-purge agar image tetap ramping.
+RUN apt-get update && apt-get install -y --no-install-recommends $PHPIZE_DEPS \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apt-get purge -y --auto-remove $PHPIZE_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
 # Enable Apache mod_rewrite for Laravel
 RUN a2enmod rewrite
 

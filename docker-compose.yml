@@ -1,6 +1,10 @@
 services:
   app:
-    images: dkr-reg.serenetia.com/dellzevz/project-akhir-wp-ii:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Untuk deploy image hasil CI (bukan build lokal), ganti blok build di atas
+    # dengan: image: dkr-reg.serenetia.com/<owner>/<repo>:latest
     container_name: pawp2_app
     restart: unless-stopped
     ports:
@@ -8,78 +12,41 @@ services:
     environment:
       APP_NAME: ${APP_NAME:-BarberFlow}
       APP_ENV: ${APP_ENV:-production}
-      # APP_KEY di-set eksplisit agar konsisten antar restart/redeploy (kalau
-      # dibiarkan kosong, entrypoint akan generate key baru setiap container
-      # fresh sehingga session & data terenkripsi rusak). Untuk produksi nyata,
-      # override lewat environment variable platform deploy.
+      # APP_KEY di-set eksplisit agar konsisten antar restart/redeploy. Untuk
+      # produksi nyata, override lewat environment variable platform deploy.
       APP_KEY: ${APP_KEY:-base64:AMGr55gxQLgfvGdu5mulNDJysOE3fNLv0HVdUE9cQsA=}
       APP_DEBUG: ${APP_DEBUG:-false}
       APP_URL: ${APP_URL:-http://localhost:8000}
 
+      # ==== MySQL EKSTERNAL — WAJIB diisi (tidak ada default host) ====
       DB_CONNECTION: mysql
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-db_projectakhir}
-      DB_USERNAME: ${DB_USERNAME:-laravel}
-      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
 
+      # Default driver = database (aman tanpa redis). Untuk memakai Redis
+      # eksternal, override jadi "redis" di env platform lalu isi REDIS_* di bawah.
       SESSION_DRIVER: ${SESSION_DRIVER:-database}
       CACHE_STORE: ${CACHE_STORE:-database}
       QUEUE_CONNECTION: ${QUEUE_CONNECTION:-database}
 
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      # Redis eksternal (dipakai hanya jika driver di atas di-set "redis").
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: ${REDIS_HOST:-}
+      REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
 
       MAIL_MAILER: ${MAIL_MAILER:-log}
+
+      RAJAONGKIR_API_KEY: ${RAJAONGKIR_API_KEY}
+      RAJAONGKIR_BASE_URL: ${RAJAONGKIR_BASE_URL:-https://rajaongkir.komerce.id/api/v1}
+      RAJAONGKIR_ORIGIN: ${RAJAONGKIR_ORIGIN}
     volumes:
+      # Persist file yang diunggah (gambar). Pada pembuatan pertama, volume ini
+      # otomatis diisi dari isi folder storage di image (termasuk gambar seed).
       - storage_data:/var/www/html/storage
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - pawp2_network
-
-  db:
-    image: mysql:8.0
-    container_name: pawp2_db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-db_projectakhir}
-      MYSQL_USER: ${DB_USERNAME:-laravel}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
-    ports:
-      - "3307:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./database_backup.sql:/docker-entrypoint-initdb.d/database_backup.sql:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootsecret}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    networks:
-      - pawp2_network
-
-  redis:
-    image: redis:7-alpine
-    container_name: pawp2_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - pawp2_network
 
 volumes:
-  db_data:
-  redis_data:
   storage_data:
-
-networks:
-  pawp2_network:
-    driver: bridge
