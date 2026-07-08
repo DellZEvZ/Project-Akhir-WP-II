@@ -37,6 +37,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends $PHPIZE_DEPS \
 # Enable Apache mod_rewrite for Laravel
 RUN a2enmod rewrite
 
+# Set ServerName global untuk menghilangkan warning AH00558
+# ("Could not reliably determine the server's fully qualified domain name").
+# Murni kosmetik agar log bersih; tidak mempengaruhi fungsi.
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
 # Set working directory
 WORKDIR /var/www/html
 
