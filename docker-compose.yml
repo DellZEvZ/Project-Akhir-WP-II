@@ -48,6 +48,13 @@ services:
       RAJAONGKIR_API_KEY: ${RAJAONGKIR_API_KEY}
       RAJAONGKIR_BASE_URL: ${RAJAONGKIR_BASE_URL:-https://rajaongkir.komerce.id/api/v1}
       RAJAONGKIR_ORIGIN: ${RAJAONGKIR_ORIGIN}
+
+      # Google OAuth untuk login customer. Kalau GOOGLE_REDIRECT_URL kosong,
+      # Socialite tidak mengirim redirect_uri -> Google menolak dengan
+      # "Missing required parameter: redirect_uri".
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URL: ${GOOGLE_REDIRECT_URL}
     volumes:
       # Persist file yang diunggah (gambar). Pada pembuatan pertama, volume ini
       # otomatis diisi dari isi folder storage di image (termasuk gambar seed).
