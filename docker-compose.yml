@@ -26,10 +26,14 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
 
-      # Default driver = database (aman tanpa redis). Untuk memakai Redis
-      # eksternal, override jadi "redis" di env platform lalu isi REDIS_* di bawah.
-      SESSION_DRIVER: ${SESSION_DRIVER:-database}
-      CACHE_STORE: ${CACHE_STORE:-database}
+      # Session & cache memakai disk LOKAL container, bukan database.
+      # Alasan: database berada di server terpisah dengan latensi tinggi
+      # (~1 detik per query). Driver "database" menambah 2-3 roundtrip DB pada
+      # SETIAP request. Driver "file" menulis ke volume storage -> ~0 ms.
+      # Catatan: "file" hanya cocok untuk SATU container app. Kalau nanti
+      # di-scale ke banyak container, pindahkan ke "redis" (bersama).
+      SESSION_DRIVER: ${SESSION_DRIVER:-file}
+      CACHE_STORE: ${CACHE_STORE:-file}
       QUEUE_CONNECTION: ${QUEUE_CONNECTION:-database}
 
       # Redis eksternal (dipakai hanya jika driver di atas di-set "redis").

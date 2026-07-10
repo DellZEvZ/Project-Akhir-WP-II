@@ -57,23 +57,28 @@ class ProdukController extends Controller
                 return $response;
             }
 
+            // Input harga memakai pemisah ribuan ("50.000"). Bersihkan lebih dulu
+            // agar aturan numeric|min:0 di bawah menilai angka mentahnya.
+            $request->merge(['harga' => str_replace('.', '', (string) $request->input('harga'))]);
+
             // VALIDASI
             $validatedData = $request->validate([
                 'kategori_id' => 'required',
                 'nama_produk' => 'required|max:255|unique:produk',
                 'detail' => 'required',
-                'harga' => 'required',
+                'harga' => 'required|numeric|min:0',
                 'berat' => 'required',
                 'stok' => 'required',
                 'foto' => 'required|image|mimes:jpeg,jpg,png,gif|max:1024',
             ], [
                 'foto.image' => 'Format gambar harus jpeg, jpg, png, atau gif.',
-                'foto.max'   => 'Ukuran file maksimal 1024 KB.'
+                'foto.max'   => 'Ukuran file maksimal 1024 KB.',
+                'harga.numeric' => 'Harga harus berupa angka.',
+                'harga.min'     => 'Harga tidak boleh bernilai negatif.',
             ]);
 
             $validatedData['status'] = 0;
             $validatedData['user_id'] = auth()->id();
-            $validatedData['harga'] = str_replace('.', '', $validatedData['harga']);
             $validatedData['berat'] = preg_replace('/[^0-9.]/', '', $validatedData['berat']);
             $validatedData['stok'] = preg_replace('/[^0-9]/', '', $validatedData['stok']);
 
@@ -182,12 +187,16 @@ class ProdukController extends Controller
         // Save old data for logging
         $oldData = $produk->only(['nama_produk', 'kategori_id', 'harga', 'stok', 'status']);
 
+        // Input harga memakai pemisah ribuan ("50.000"). Bersihkan lebih dulu
+        // agar aturan numeric|min:0 di bawah menilai angka mentahnya.
+        $request->merge(['harga' => str_replace('.', '', (string) $request->input('harga'))]);
+
         $rules = [
             'nama_produk' => 'required|max:255|unique:produk,nama_produk,' . $id,
             'kategori_id' => 'required',
             'status'      => 'required',
             'detail'      => 'required',
-            'harga'       => 'required',
+            'harga'       => 'required|numeric|min:0',
             'berat'       => 'required',
             'stok'        => 'required',
             'foto'        => 'image|mimes:jpeg,jpg,png,gif|max:1024',
@@ -196,6 +205,8 @@ class ProdukController extends Controller
         $messages = [
             'foto.image' => 'Format gambar harus jpeg, jpg, png, atau gif.',
             'foto.max'   => 'Ukuran gambar maksimal 1024 KB.',
+            'harga.numeric' => 'Harga harus berupa angka.',
+            'harga.min'     => 'Harga tidak boleh bernilai negatif.',
         ];
 
         // Validasi input
@@ -205,7 +216,6 @@ class ProdukController extends Controller
         $validatedData['user_id'] = auth()->id();
 
         // Bersihkan nilai numerik
-        $validatedData['harga'] = str_replace('.', '', $validatedData['harga']);
         $validatedData['berat'] = preg_replace('/[^0-9.]/', '', $validatedData['berat']);
         $validatedData['stok'] = preg_replace('/[^0-9]/', '', $validatedData['stok']);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Layanan;
 use App\Models\Barber;
 use App\Models\Galeri;
@@ -11,29 +12,47 @@ use App\Models\Kategori;
 
 class FrontController extends Controller
 {
+    /**
+     * Cache data katalog publik selama 10 menit.
+     *
+     * Database berada di server terpisah dengan latensi ~1 detik per query,
+     * sehingga tiap query menyumbang beberapa detik pada waktu muat halaman.
+     * Data katalog jarang berubah, jadi aman di-cache. Perubahan dari panel
+     * admin tampil paling lambat 10 menit (atau setelah `php artisan cache:clear`).
+     *
+     * Hanya dipakai untuk tampilan default; hasil pencarian/filter TIDAK
+     * di-cache karena kombinasinya banyak dan jarang berulang.
+     */
+    private function ingat(string $key, \Closure $fn)
+    {
+        return Cache::remember($key, now()->addMinutes(10), $fn);
+    }
+
     // Homepage
     public function index()
     {
-        $layananUnggulan = Layanan::where('status', 'aktif')->latest()->take(6)->get();
-        $barbers         = Barber::where('status', 'aktif')->take(4)->get();
-        $galeris         = Galeri::latest()->take(8)->get();
-        $produkUnggulan  = Produk::where('status', 1)->latest()->take(4)->get();
+        $data = $this->ingat('front:beranda', fn () => [
+            'layananUnggulan' => Layanan::where('status', 'aktif')->latest()->take(6)->get(),
+            'barbers'         => Barber::where('status', 'aktif')->take(4)->get(),
+            'galeris'         => Galeri::latest()->take(8)->get(),
+            'produkUnggulan'  => Produk::where('status', 1)->latest()->take(4)->get(),
+        ]);
 
-        return view('frontend.v_beranda.index', compact(
-            'layananUnggulan', 'barbers', 'galeris', 'produkUnggulan'
-        ));
+        return view('frontend.v_beranda.index', $data);
     }
 
     // Semua layanan + pencarian
     public function layanan(Request $request)
     {
-        $query = Layanan::where('status', 'aktif');
+        $ambil = fn () => Layanan::where('status', 'aktif')
+            ->when($request->filled('search'), fn ($q) => $q->where('nama_layanan', 'like', '%' . $request->search . '%'))
+            ->orderBy('harga')
+            ->paginate(9)
+            ->withQueryString();
 
-        if ($request->filled('search')) {
-            $query->where('nama_layanan', 'like', '%' . $request->search . '%');
-        }
-
-        $layanans = $query->orderBy('harga')->paginate(9)->withQueryString();
+        $layanans = $request->filled('search')
+            ? $ambil()
+            : $this->ingat('front:layanan:p' . $request->integer('page', 1), $ambil);
 
         return view('frontend.v_layanan.index', [
             'layanans' => $layanans,
@@ -44,29 +63,43 @@ class FrontController extends Controller
     // Detail layanan
     public function layananDetail($id)
     {
-        $layanan = Layanan::where('status', 'aktif')->findOrFail($id);
-        $lainnya = Layanan::where('status', 'aktif')->where('id', '!=', $id)->take(3)->get();
+        $key  = "front:layanan:detail:{$id}";
+        $data = $this->ingat($key, fn () => [
+            'layanan' => Layanan::where('status', 'aktif')->find($id),
+            'lainnya' => Layanan::where('status', 'aktif')->where('id', '!=', $id)->take(3)->get(),
+        ]);
 
-        return view('frontend.v_layanan.detail', compact('layanan', 'lainnya'));
+        if (! $data['layanan']) {
+            Cache::forget($key); // jangan simpan hasil "tidak ditemukan"
+            abort(404);
+        }
+
+        return view('frontend.v_layanan.detail', $data);
     }
 
     // Tim barber
     public function barber()
     {
-        $barbers = Barber::where('status', 'aktif')->orderBy('nama')->get();
+        $barbers = $this->ingat(
+            'front:barber',
+            fn () => Barber::where('status', 'aktif')->orderBy('nama')->get()
+        );
+
         return view('frontend.v_barber.index', compact('barbers'));
     }
 
     // Galeri
     public function galeri(Request $request)
     {
-        $query = Galeri::query();
+        $ambil = fn () => Galeri::query()
+            ->when($request->filled('tipe'), fn ($q) => $q->where('tipe', $request->tipe))
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
 
-        if ($request->filled('tipe')) {
-            $query->where('tipe', $request->tipe);
-        }
-
-        $galeris = $query->latest()->paginate(12)->withQueryString();
+        $galeris = $request->filled('tipe')
+            ? $ambil()
+            : $this->ingat('front:galeri:p' . $request->integer('page', 1), $ambil);
 
         return view('frontend.v_galeri.index', [
             'galeris' => $galeris,
@@ -77,18 +110,20 @@ class FrontController extends Controller
     // Katalog produk
     public function produk(Request $request)
     {
-        $query = Produk::where('status', 1);
+        $adaFilter = $request->filled('search') || $request->filled('kategori');
 
-        if ($request->filled('search')) {
-            $query->where('nama_produk', 'like', '%' . $request->search . '%');
-        }
+        $ambil = fn () => Produk::where('status', 1)
+            ->when($request->filled('search'), fn ($q) => $q->where('nama_produk', 'like', '%' . $request->search . '%'))
+            ->when($request->filled('kategori'), fn ($q) => $q->where('kategori_id', $request->kategori))
+            ->latest()
+            ->paginate(9)
+            ->withQueryString();
 
-        if ($request->filled('kategori')) {
-            $query->where('kategori_id', $request->kategori);
-        }
+        $produks = $adaFilter
+            ? $ambil()
+            : $this->ingat('front:produk:p' . $request->integer('page', 1), $ambil);
 
-        $produks   = $query->latest()->paginate(9)->withQueryString();
-        $kategoris = Kategori::all();
+        $kategoris = $this->ingat('front:kategori', fn () => Kategori::all());
 
         return view('frontend.v_produk.index', [
             'produks'   => $produks,
@@ -100,10 +135,18 @@ class FrontController extends Controller
     // Detail produk
     public function produkDetail($id)
     {
-        $produk  = Produk::where('status', 1)->findOrFail($id);
-        $lainnya = Produk::where('status', 1)->where('id', '!=', $id)->take(4)->get();
+        $key  = "front:produk:detail:{$id}";
+        $data = $this->ingat($key, fn () => [
+            'produk'  => Produk::where('status', 1)->find($id),
+            'lainnya' => Produk::where('status', 1)->where('id', '!=', $id)->take(4)->get(),
+        ]);
 
-        return view('frontend.v_produk.detail', compact('produk', 'lainnya'));
+        if (! $data['produk']) {
+            Cache::forget($key); // jangan simpan hasil "tidak ditemukan"
+            abort(404);
+        }
+
+        return view('frontend.v_produk.detail', $data);
     }
 
     // Katalog gabungan: layanan + produk dalam satu halaman
@@ -112,15 +155,18 @@ class FrontController extends Controller
         $search = $request->search;
         $tab    = $request->get('tab', 'layanan');
 
-        $layanans = Layanan::where('status', 'aktif')
+        $ambilLayanan = fn () => Layanan::where('status', 'aktif')
             ->when($search, fn ($q) => $q->where('nama_layanan', 'like', "%{$search}%"))
             ->orderBy('harga')
             ->get();
 
-        $produks = Produk::where('status', 1)
+        $ambilProduk = fn () => Produk::where('status', 1)
             ->when($search, fn ($q) => $q->where('nama_produk', 'like', "%{$search}%"))
             ->latest()
             ->get();
+
+        $layanans = $search ? $ambilLayanan() : $this->ingat('front:catalog:layanan', $ambilLayanan);
+        $produks  = $search ? $ambilProduk()  : $this->ingat('front:catalog:produk', $ambilProduk);
 
         return view('frontend.v_catalog.index', compact('layanans', 'produks', 'search', 'tab'));
     }
