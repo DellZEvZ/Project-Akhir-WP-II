@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql bcmath gd zip
+    && docker-php-ext-install pdo_mysql bcmath gd zip opcache
 
 # Install ekstensi Redis (phpredis) via PECL. Diperlukan HANYA jika driver
 # cache/session/queue diarahkan ke redis (mis. REDIS eksternal). $PHPIZE_DEPS
@@ -34,12 +34,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends $PHPIZE_DEPS \
     && apt-get purge -y --auto-remove $PHPIZE_DEPS \
     && rm -rf /var/lib/apt/lists/*
 
-# Aktifkan OPcache. Image php:*-apache TIDAK mengaktifkannya secara default,
-# sehingga PHP mengompilasi ulang seluruh file Laravel pada SETIAP request.
+# Konfigurasi OPcache (ekstensinya sudah di-install di RUN pertama, saat build-tools
+# bawaan image masih tersedia). Image php:*-apache TIDAK mengaktifkan OPcache secara
+# default, sehingga PHP mengompilasi ulang seluruh file Laravel pada SETIAP request.
 # validate_timestamps=0 aman karena kode di dalam image bersifat immutable
 # (tidak pernah berubah saat runtime); cache di-reset saat container di-deploy ulang.
-RUN docker-php-ext-install opcache \
-    && { \
+RUN { \
         echo 'opcache.enable=1'; \
         echo 'opcache.enable_cli=0'; \
         echo 'opcache.memory_consumption=128'; \
@@ -47,8 +47,6 @@ RUN docker-php-ext-install opcache \
         echo 'opcache.max_accelerated_files=20000'; \
         echo 'opcache.validate_timestamps=0'; \
         echo 'opcache.revalidate_freq=0'; \
-        echo 'opcache.jit=tracing'; \
-        echo 'opcache.jit_buffer_size=64M'; \
     } > /usr/local/etc/php/conf.d/opcache.ini
 
 # Enable Apache mod_rewrite for Laravel
