@@ -214,7 +214,7 @@
         <div class="row">
             <div class="col-md-4 mb-4">
                 <h4 class="text-white font-head">
-                    <img src="{{ asset('image/logos/logo.png') }}" alt="Barber Flow Logo" style="height: 40px; width: auto; vertical-align: middle; margin-right: 10px;">
+                    <img loading="lazy" decoding="async" src="{{ asset('image/logos/logo.png') }}" alt="Barber Flow Logo" style="height: 40px; width: auto; vertical-align: middle; margin-right: 10px;">
                     BARBER<span class="text-gold">FLOW</span>
                 </h4>
                 <p class="small">Barbershop modern dengan layanan men's grooming premium. Tampil rapi, percaya diri, dan bergaya.</p>

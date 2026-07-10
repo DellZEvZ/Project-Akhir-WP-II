@@ -23,7 +23,7 @@
             @forelse ($galeris as $g)
             <div class="col-md-3 col-6">
                 <div class="card card-bf">
-                    <img src="{{ asset('storage/img-galeri/' . $g->foto) }}" style="height:230px;object-fit:cover;" alt="{{ $g->judul }}">
+                    <img loading="lazy" decoding="async" src="{{ asset('storage/img-galeri/' . $g->foto) }}" style="height:230px;object-fit:cover;" alt="{{ $g->judul }}">
                     <div class="card-body py-2">
                         <p class="font-head mb-1">{{ $g->judul }}</p>
                         <span class="badge bg-dark-bf text-gold">{{ $g->tipe_label }}</span>

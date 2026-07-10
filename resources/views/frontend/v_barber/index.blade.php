@@ -16,7 +16,7 @@
             <div class="col-md-3 col-6">
                 <div class="card card-bf h-100 text-center">
                     @if ($b->foto)
-                        <img src="{{ asset('storage/img-barber/' . $b->foto) }}" style="height:260px;object-fit:cover;" alt="{{ $b->nama }}">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/img-barber/' . $b->foto) }}" style="height:260px;object-fit:cover;" alt="{{ $b->nama }}">
                     @else
                         <div class="d-flex align-items-center justify-content-center bg-dark-bf" style="height:260px;">
                             <i class="bi bi-person text-gold" style="font-size:70px;"></i>

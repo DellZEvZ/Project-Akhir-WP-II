@@ -32,7 +32,7 @@
             <div class="col-md-4">
                 <div class="card card-bf h-100">
                     @if ($l->foto)
-                        <img src="{{ asset('storage/img-layanan/' . $l->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/img-layanan/' . $l->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
                     @else
                         <div class="d-flex align-items-center justify-content-center bg-dark-bf" style="height:200px;">
                             <i class="bi bi-scissors text-gold" style="font-size:54px;"></i>
@@ -73,7 +73,7 @@
             <div class="col-md-3 col-6">
                 <div class="card card-bf h-100 text-center">
                     @if ($b->foto)
-                        <img src="{{ asset('storage/img-barber/' . $b->foto) }}" style="height:240px;object-fit:cover;" alt="{{ $b->nama }}">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/img-barber/' . $b->foto) }}" style="height:240px;object-fit:cover;" alt="{{ $b->nama }}">
                     @else
                         <div class="d-flex align-items-center justify-content-center bg-dark-bf" style="height:240px;">
                             <i class="bi bi-person text-gold" style="font-size:64px;"></i>
@@ -105,7 +105,7 @@
             @foreach ($galeris as $g)
             <div class="col-md-3 col-6">
                 <div class="card card-bf">
-                    <img src="{{ asset('storage/img-galeri/' . $g->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $g->judul }}">
+                    <img loading="lazy" decoding="async" src="{{ asset('storage/img-galeri/' . $g->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $g->judul }}">
                     <div class="card-body py-2">
                         <p class="small mb-0 font-head">{{ $g->judul }}</p>
                         <span class="badge bg-dark-bf text-gold">{{ $g->tipe_label }}</span>
@@ -133,7 +133,7 @@
             @foreach ($produkUnggulan as $p)
             <div class="col-md-3 col-6">
                 <div class="card card-bf h-100">
-                    <img src="{{ asset('storage/img-produk/' . $p->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $p->nama_produk }}">
+                    <img loading="lazy" decoding="async" src="{{ asset('storage/img-produk/' . $p->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $p->nama_produk }}">
                     <div class="card-body">
                         <h6 class="font-head mb-1">{{ Str::limit($p->nama_produk, 28) }}</h6>
                         <span class="price-tag">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>

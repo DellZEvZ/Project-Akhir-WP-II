@@ -15,7 +15,7 @@
         <div class="row g-4">
             <div class="col-md-6">
                 @if ($layanan->foto)
-                    <img src="{{ asset('storage/img-layanan/' . $layanan->foto) }}" class="img-fluid rounded shadow-sm w-100" style="max-height:400px;object-fit:cover;" alt="{{ $layanan->nama_layanan }}">
+                    <img fetchpriority="high" decoding="async" src="{{ asset('storage/img-layanan/' . $layanan->foto) }}" class="img-fluid rounded shadow-sm w-100" style="max-height:400px;object-fit:cover;" alt="{{ $layanan->nama_layanan }}">
                 @else
                     <div class="d-flex align-items-center justify-content-center bg-dark-bf rounded" style="height:400px;">
                         <i class="bi bi-scissors text-gold" style="font-size:90px;"></i>
@@ -51,7 +51,7 @@
             <div class="col-md-4">
                 <div class="card card-bf h-100">
                     @if ($l->foto)
-                        <img src="{{ asset('storage/img-layanan/' . $l->foto) }}" style="height:160px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/img-layanan/' . $l->foto) }}" style="height:160px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
                     @else
                         <div class="d-flex align-items-center justify-content-center bg-dark-bf" style="height:160px;">
                             <i class="bi bi-scissors text-gold" style="font-size:40px;"></i>

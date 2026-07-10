@@ -32,7 +32,7 @@
             @forelse ($produks as $p)
             <div class="col-md-4 col-6">
                 <div class="card card-bf h-100">
-                    <img src="{{ asset('storage/img-produk/' . $p->foto) }}" style="height:220px;object-fit:cover;" alt="{{ $p->nama_produk }}">
+                    <img loading="lazy" decoding="async" src="{{ asset('storage/img-produk/' . $p->foto) }}" style="height:220px;object-fit:cover;" alt="{{ $p->nama_produk }}">
                     <div class="card-body">
                         <h6 class="font-head mb-1">{{ Str::limit($p->nama_produk, 32) }}</h6>
                         <span class="price-tag">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>

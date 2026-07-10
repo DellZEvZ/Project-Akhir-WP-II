@@ -29,7 +29,7 @@
             <div class="col-md-4">
                 <div class="card card-bf h-100">
                     @if ($l->foto)
-                        <img src="{{ asset('storage/img-layanan/' . $l->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/img-layanan/' . $l->foto) }}" style="height:200px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
                     @else
                         <div class="d-flex align-items-center justify-content-center bg-dark-bf" style="height:200px;">
                             <i class="bi bi-scissors text-gold" style="font-size:54px;"></i>

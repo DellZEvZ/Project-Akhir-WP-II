@@ -14,7 +14,7 @@
 
         <div class="row g-4">
             <div class="col-md-6">
-                <img src="{{ asset('storage/img-produk/' . $produk->foto) }}" class="img-fluid rounded shadow-sm w-100" style="max-height:420px;object-fit:cover;" alt="{{ $produk->nama_produk }}">
+                <img fetchpriority="high" decoding="async" src="{{ asset('storage/img-produk/' . $produk->foto) }}" class="img-fluid rounded shadow-sm w-100" style="max-height:420px;object-fit:cover;" alt="{{ $produk->nama_produk }}">
             </div>
             <div class="col-md-6">
                 <h2 class="font-head">{{ $produk->nama_produk }}</h2>
@@ -53,7 +53,7 @@
             @foreach ($lainnya as $p)
             <div class="col-md-3 col-6">
                 <div class="card card-bf h-100">
-                    <img src="{{ asset('storage/img-produk/' . $p->foto) }}" style="height:160px;object-fit:cover;" alt="{{ $p->nama_produk }}">
+                    <img loading="lazy" decoding="async" src="{{ asset('storage/img-produk/' . $p->foto) }}" style="height:160px;object-fit:cover;" alt="{{ $p->nama_produk }}">
                     <div class="card-body">
                         <h6 class="font-head mb-1">{{ Str::limit($p->nama_produk, 26) }}</h6>
                         <span class="price-tag">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>

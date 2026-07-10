@@ -32,7 +32,7 @@
                                     <tr class="cart-row" id="cart-row-{{ $item->id }}">
                                         <td style="padding:14px 16px;">
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ $foto }}" width="56" height="56" class="rounded me-3" style="object-fit:cover;" alt="">
+                                                <img loading="lazy" decoding="async" src="{{ $foto }}" width="56" height="56" class="rounded me-3" style="object-fit:cover;" alt="">
                                                 <div>
                                                     <div class="font-head">{{ $nama }}</div>
                                                     <small class="text-muted">

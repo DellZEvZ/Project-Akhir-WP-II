@@ -36,7 +36,7 @@
                     @php $img = $l->foto ? asset('storage/img-layanan/'.$l->foto) : asset('image/img-default.jpg'); @endphp
                     <div class="col-md-4 col-6 product-cell">
                         <div class="card card-bf h-100">
-                            <img src="{{ $img }}" style="height:200px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
+                            <img loading="lazy" decoding="async" src="{{ $img }}" style="height:200px;object-fit:cover;" alt="{{ $l->nama_layanan }}">
                             <div class="card-body">
                                 <h6 class="font-head mb-1">{{ $l->nama_layanan }}</h6>
                                 <span class="price-tag">Rp {{ number_format($l->harga, 0, ',', '.') }}</span>
@@ -61,7 +61,7 @@
                     @php $img = $p->foto ? asset('storage/img-produk/'.$p->foto) : asset('image/img-default.jpg'); @endphp
                     <div class="col-md-3 col-6 product-cell">
                         <div class="card card-bf h-100">
-                            <img src="{{ $img }}" style="height:200px;object-fit:cover;" alt="{{ $p->nama_produk }}">
+                            <img loading="lazy" decoding="async" src="{{ $img }}" style="height:200px;object-fit:cover;" alt="{{ $p->nama_produk }}">
                             <div class="card-body">
                                 <h6 class="font-head mb-1">{{ Str::limit($p->nama_produk, 30) }}</h6>
                                 <span class="price-tag">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
