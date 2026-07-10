@@ -12,6 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Aplikasi berjalan di belakang reverse proxy (mis. Coolify/Traefik) yang
+        // menerminasi TLS lalu meneruskan request sebagai http. Tanpa ini Laravel
+        // mengira skema-nya http, sehingga route()/url()/asset() menghasilkan URL
+        // http:// di halaman https:// -> diblokir browser sebagai mixed content
+        // (gejalanya: fetch AJAX gagal, gambar tidak muncul).
+        // Mempercayai header X-Forwarded-* dari proxy memperbaiki deteksi https.
+        $middleware->trustProxies(at: '*');
+
         // Register permission middleware alias
         $middleware->alias([
             'permission'  => \App\Http\Middleware\CheckPermission::class,
