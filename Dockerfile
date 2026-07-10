@@ -34,6 +34,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends $PHPIZE_DEPS \
     && apt-get purge -y --auto-remove $PHPIZE_DEPS \
     && rm -rf /var/lib/apt/lists/*
 
+# Aktifkan OPcache. Image php:*-apache TIDAK mengaktifkannya secara default,
+# sehingga PHP mengompilasi ulang seluruh file Laravel pada SETIAP request.
+# validate_timestamps=0 aman karena kode di dalam image bersifat immutable
+# (tidak pernah berubah saat runtime); cache di-reset saat container di-deploy ulang.
+RUN docker-php-ext-install opcache \
+    && { \
+        echo 'opcache.enable=1'; \
+        echo 'opcache.enable_cli=0'; \
+        echo 'opcache.memory_consumption=128'; \
+        echo 'opcache.interned_strings_buffer=16'; \
+        echo 'opcache.max_accelerated_files=20000'; \
+        echo 'opcache.validate_timestamps=0'; \
+        echo 'opcache.revalidate_freq=0'; \
+        echo 'opcache.jit=tracing'; \
+        echo 'opcache.jit_buffer_size=64M'; \
+    } > /usr/local/etc/php/conf.d/opcache.ini
+
 # Enable Apache mod_rewrite for Laravel
 RUN a2enmod rewrite
 
