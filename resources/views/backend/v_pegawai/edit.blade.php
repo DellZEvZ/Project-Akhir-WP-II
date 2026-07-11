@@ -20,7 +20,7 @@
             <div class="card-body">
                 <h5 class="card-title mb-4">Form Edit Pegawai</h5>
 
-                <form action="{{ route('backend.pegawai.update', $pegawai->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('backend.pegawai.update', $pegawai->id) }}" method="POST" enctype="multipart/form-data" hx-boost="false">
                     @csrf
                     @method('PUT')
 

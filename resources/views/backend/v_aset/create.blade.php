@@ -21,7 +21,7 @@
             <div class="card-body">
                 <h5 class="card-title mb-4">Form Tambah Aset/Inventaris</h5>
 
-                <form action="{{ route('backend.aset.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('backend.aset.store') }}" method="POST" enctype="multipart/form-data" hx-boost="false">
                     @csrf
 
                     <div class="row">

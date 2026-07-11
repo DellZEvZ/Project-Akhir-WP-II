@@ -6,10 +6,11 @@ use App\Models\Kategori;
 use Illuminate\Http\Request;
 use App\Helpers\ActivityLogger;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class KategoriController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
     public function index()
     {
         // Check permission
@@ -17,7 +18,7 @@ class KategoriController extends Controller
             return $response;
         }
 
-        $kategori = Kategori::orderBy('nama_kategori', 'asc')->get();
+        $kategori = $this->rememberAdminList('kategori', 'all', fn () => Kategori::orderBy('nama_kategori', 'asc')->get());
 
         return view('backend.v_kategori.index', [
             'judul' => 'Kategori',
@@ -55,6 +56,7 @@ class KategoriController extends Controller
 
         // Log activity
         ActivityLogger::created('kategori', $kategori->nama_kategori, $kategori);
+        $this->forgetAdminList('kategori');
 
         return redirect()
             ->route('backend.kategori.index')
@@ -111,6 +113,7 @@ class KategoriController extends Controller
         // Log activity
         $newData = ['nama_kategori' => $kategori->nama_kategori];
         ActivityLogger::updated('kategori', $kategori->nama_kategori, $kategori, $oldData, $newData);
+        $this->forgetAdminList('kategori');
 
         return redirect()
             ->route('backend.kategori.index')
@@ -134,6 +137,7 @@ class KategoriController extends Controller
         ActivityLogger::deleted('kategori', $kategoriName, $kategori);
 
         $kategori->delete();
+        $this->forgetAdminList('kategori');
 
         return redirect()
             ->route('backend.kategori.index')

@@ -63,7 +63,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <form class="form-horizontal" action="{{ route('backend.user.store') }}" method="post" enctype="multipart/form-data">
+                <form class="form-horizontal" action="{{ route('backend.user.store') }}" method="post" enctype="multipart/form-data" hx-boost="false">
                     @csrf
 
                     <div class="card-body">

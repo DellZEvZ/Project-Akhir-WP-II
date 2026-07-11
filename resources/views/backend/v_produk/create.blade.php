@@ -9,7 +9,8 @@
                 <form class="form-horizontal"
                       action="{{ route('backend.produk.store') }}"
                       method="post"
-                      enctype="multipart/form-data">
+                      enctype="multipart/form-data"
+                      hx-boost="false">
                     @csrf
 
                     <div class="card-body">

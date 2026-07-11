@@ -55,7 +55,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <form action="{{ route('backend.user.update', $edit->id) }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('backend.user.update', $edit->id) }}" method="post" enctype="multipart/form-data" hx-boost="false">
                     @method('put')
                     @csrf
 

@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Layanan;
 use App\Helpers\ImageHelper;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class LayananController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
 
     public function index(Request $request)
     {
@@ -17,21 +18,22 @@ class LayananController extends Controller
             return $response;
         }
 
-        $query = Layanan::query();
+        $fetch = fn () => Layanan::query()
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('nama_layanan', 'like', "%{$search}%")
+                       ->orWhere('deskripsi', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('harga')->paginate(15);
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
+        $hasFilter = $request->filled('status') || $request->filled('search');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_layanan', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%");
-            });
-        }
-
-        $layanans = $query->orderBy('harga')->paginate(15);
+        $layanans = $hasFilter
+            ? $fetch()
+            : $this->rememberAdminList('layanan', 'p' . $request->integer('page', 1), $fetch);
 
         return view('backend.v_layanan.index', [
             'judul'    => 'Data Layanan',
@@ -73,6 +75,7 @@ class LayananController extends Controller
         }
 
         Layanan::create($data);
+        $this->forgetAdminList('layanan');
 
         return redirect()->route('backend.layanan.index')
             ->with('success', 'Layanan berhasil ditambahkan.');
@@ -126,6 +129,7 @@ class LayananController extends Controller
         }
 
         $layanan->update($data);
+        $this->forgetAdminList('layanan');
 
         return redirect()->route('backend.layanan.index')
             ->with('success', 'Layanan berhasil diperbarui.');
@@ -142,6 +146,7 @@ class LayananController extends Controller
         }
 
         $layanan->delete();
+        $this->forgetAdminList('layanan');
 
         return redirect()->route('backend.layanan.index')
             ->with('success', 'Layanan berhasil dihapus.');

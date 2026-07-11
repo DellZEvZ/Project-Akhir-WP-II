@@ -20,7 +20,7 @@
             <div class="card-body">
                 <h5 class="card-title mb-4">Edit Data Barber</h5>
 
-                <form action="{{ route('backend.barber.update', $barber->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('backend.barber.update', $barber->id) }}" method="POST" enctype="multipart/form-data" hx-boost="false">
                     @csrf @method('PUT')
 
                     <div class="form-group">

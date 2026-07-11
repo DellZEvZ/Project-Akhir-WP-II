@@ -111,7 +111,7 @@
                     <strong>Format file:</strong> .zip (maksimal 500MB)
                 </div>
 
-                <form action="{{ route('backend.setting.backup.upload') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('backend.setting.backup.upload') }}" method="POST" enctype="multipart/form-data" hx-boost="false">
                     @csrf
                     <div class="form-group">
                         <div class="custom-file">

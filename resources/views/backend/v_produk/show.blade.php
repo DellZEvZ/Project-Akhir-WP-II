@@ -70,7 +70,8 @@
                             <h5>Tambahkan Gambar Produk</h5>
                             <form action="{{ route('backend.foto_produk.store') }}"
                                   method="POST"
-                                  enctype="multipart/form-data">
+                                  enctype="multipart/form-data"
+                                  hx-boost="false">
                                 @csrf
 
                                 <input type="hidden" name="produk_id" value="{{ $show->id }}">
@@ -159,7 +160,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    $(document).ready(function () {
         const buttons = document.querySelectorAll('.show_confirm');
 
         buttons.forEach(btn => {

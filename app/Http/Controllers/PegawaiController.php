@@ -8,10 +8,11 @@ use App\Models\User;
 use App\Helpers\ImageHelper;
 use App\Helpers\ActivityLogger;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class PegawaiController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
     /**
      * Display a listing of the resource.
      */
@@ -22,30 +23,25 @@ class PegawaiController extends Controller
             return $response;
         }
 
-        $query = Pegawai::with('user');
+        $fetch = fn () => Pegawai::with('user')
+            ->when($request->filled('status'), fn ($q) => $q->where('status_pegawai', $request->status))
+            ->when($request->filled('departemen'), fn ($q) => $q->where('departemen', $request->departemen))
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('nama', 'like', "%{$search}%")
+                       ->orWhere('email', 'like', "%{$search}%")
+                       ->orWhere('jabatan', 'like', "%{$search}%")
+                       ->orWhere('no_hp', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('updated_at', 'desc')->paginate(15);
 
-        // Filter berdasarkan status
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status_pegawai', $request->status);
-        }
+        $hasFilter = $request->filled('status') || $request->filled('departemen') || $request->filled('search');
 
-        // Filter berdasarkan departemen
-        if ($request->has('departemen') && $request->departemen != '') {
-            $query->where('departemen', $request->departemen);
-        }
-
-        // Search berdasarkan nama, email, atau jabatan
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('jabatan', 'like', "%{$search}%")
-                  ->orWhere('no_hp', 'like', "%{$search}%");
-            });
-        }
-
-        $pegawai = $query->orderBy('updated_at', 'desc')->paginate(15);
+        $pegawai = $hasFilter
+            ? $fetch()
+            : $this->rememberAdminList('pegawai', 'p' . $request->integer('page', 1), $fetch);
 
         return view('backend.v_pegawai.index', [
             'judul' => 'Data Pegawai',
@@ -134,6 +130,7 @@ class PegawaiController extends Controller
 
         // Log activity
         ActivityLogger::created('pegawai', $pegawai->nama, $pegawai);
+        $this->forgetAdminList('pegawai');
 
         return redirect()
             ->route('backend.pegawai.index')
@@ -255,6 +252,7 @@ class PegawaiController extends Controller
         // Log activity
         $newData = $pegawai->only(['nama', 'email', 'jabatan', 'departemen', 'status_pegawai']);
         ActivityLogger::updated('pegawai', $pegawai->nama, $pegawai, $oldData, $newData);
+        $this->forgetAdminList('pegawai');
 
         return redirect()
             ->route('backend.pegawai.index')
@@ -295,6 +293,7 @@ class PegawaiController extends Controller
 
         // Hapus data pegawai dari database
         $pegawai->delete();
+        $this->forgetAdminList('pegawai');
 
         return redirect()
             ->route('backend.pegawai.index')

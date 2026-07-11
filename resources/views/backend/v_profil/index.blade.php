@@ -23,7 +23,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('backend.profil.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('backend.profil.update') }}" method="POST" enctype="multipart/form-data" hx-boost="false">
                     @csrf
                     <div class="row mb-3">
                         <div class="col-md-3 text-center">

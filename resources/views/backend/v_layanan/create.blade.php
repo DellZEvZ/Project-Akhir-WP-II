@@ -20,7 +20,7 @@
             <div class="card-body">
                 <h5 class="card-title mb-4">Form Tambah Layanan</h5>
 
-                <form action="{{ route('backend.layanan.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('backend.layanan.store') }}" method="POST" enctype="multipart/form-data" hx-boost="false">
                     @csrf
 
                     <div class="form-group">

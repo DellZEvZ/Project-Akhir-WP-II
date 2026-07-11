@@ -9,10 +9,11 @@ use App\Models\FotoProduk;
 use App\Helpers\ImageHelper;
 use App\Helpers\ActivityLogger;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class ProdukController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
     /**
      * Display a listing of the resource.
      */
@@ -23,7 +24,7 @@ class ProdukController extends Controller
             return $response;
         }
 
-        $produk = Produk::orderBy('updated_at', 'desc')->get();
+        $produk = $this->rememberAdminList('produk', 'all', fn () => Produk::orderBy('updated_at', 'desc')->get());
         return view('backend.v_produk.index', [
             'judul' => 'Data Produk',
             'index' => $produk
@@ -130,6 +131,7 @@ class ProdukController extends Controller
 
             // Log activity
             ActivityLogger::created('produk', $produk->nama_produk, $produk);
+            $this->forgetAdminList('produk');
 
             return redirect()
                 ->route('backend.produk.index')
@@ -271,6 +273,7 @@ class ProdukController extends Controller
         // Log activity
         $newData = $produk->only(['nama_produk', 'kategori_id', 'harga', 'stok', 'status']);
         ActivityLogger::updated('produk', $produk->nama_produk, $produk, $oldData, $newData);
+        $this->forgetAdminList('produk');
 
         return redirect()
             ->route('backend.produk.index')
@@ -335,6 +338,7 @@ class ProdukController extends Controller
 
         // Hapus data produk dari database
         $produk->delete();
+        $this->forgetAdminList('produk');
 
         return redirect()
             ->route('backend.produk.index')

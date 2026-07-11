@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Galeri;
 use App\Helpers\ImageHelper;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class GaleriController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
 
     public function index(Request $request)
     {
@@ -17,21 +18,22 @@ class GaleriController extends Controller
             return $response;
         }
 
-        $query = Galeri::query();
+        $fetch = fn () => Galeri::query()
+            ->when($request->filled('tipe'), fn ($q) => $q->where('tipe', $request->tipe))
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('judul', 'like', "%{$search}%")
+                       ->orWhere('keterangan', 'like', "%{$search}%");
+                });
+            })
+            ->latest()->paginate(18);
 
-        if ($request->filled('tipe')) {
-            $query->where('tipe', $request->tipe);
-        }
+        $hasFilter = $request->filled('tipe') || $request->filled('search');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('keterangan', 'like', "%{$search}%");
-            });
-        }
-
-        $galeris = $query->latest()->paginate(18);
+        $galeris = $hasFilter
+            ? $fetch()
+            : $this->rememberAdminList('galeri', 'p' . $request->integer('page', 1), $fetch);
 
         return view('backend.v_galeri.index', [
             'judul'   => 'Galeri Foto',
@@ -72,6 +74,8 @@ class GaleriController extends Controller
             'tipe'       => $request->tipe,
         ]);
 
+        $this->forgetAdminList('galeri');
+
         return redirect()->route('backend.galeri.index')
             ->with('success', 'Foto berhasil diupload ke galeri.');
     }
@@ -84,6 +88,7 @@ class GaleriController extends Controller
 
         ImageHelper::deleteImage($galeri->foto, 'img-galeri');
         $galeri->delete();
+        $this->forgetAdminList('galeri');
 
         return redirect()->route('backend.galeri.index')
             ->with('success', 'Foto galeri berhasil dihapus.');

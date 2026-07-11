@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\Hash;
 use App\Helpers\ImageHelper;
 use App\Helpers\ActivityLogger;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class UserController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
     /**
      * Display a listing of the resource.
      */
@@ -23,7 +24,7 @@ class UserController extends Controller
         }
 
         $judul = 'Data User';
-        $index = User::with('roles')->orderBy('updated_at', 'desc')->get();
+        $index = $this->rememberAdminList('user', 'all', fn () => User::with('roles')->orderBy('updated_at', 'desc')->get());
 
         // Add roles for permission management tab (only if super-admin)
         $roles = [];
@@ -128,9 +129,12 @@ class UserController extends Controller
                 $pegawaiData['gaji_pokok'] = $pegawaiData['gaji_pokok'] ?? 5000000;
 
                 \App\Models\Pegawai::create($pegawaiData);
+                $this->forgetAdminList('user');
 
                 return redirect()->route('backend.user.index')->with('success', 'Data user dan pegawai berhasil tersimpan');
             }
+
+            $this->forgetAdminList('user');
 
             return redirect()->route('backend.user.index')->with('success', 'Data user berhasil tersimpan');
         } else {
@@ -213,6 +217,7 @@ class UserController extends Controller
 
         // Update role menggunakan RBAC
         $user->syncRoles([$request->role_id], auth()->id());
+        $this->forgetAdminList('user');
 
         return redirect()->route('backend.user.index')->with('success', 'Data berhasil diperbaharui');
     }
@@ -237,6 +242,7 @@ class UserController extends Controller
         }
 
         $user->delete();
+        $this->forgetAdminList('user');
         return redirect()->route('backend.user.index')->with('success', 'Data berhasil dihapus');
     }
 

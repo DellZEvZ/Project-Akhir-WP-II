@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Barber;
 use App\Helpers\ImageHelper;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class BarberController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
 
     public function index(Request $request)
     {
@@ -17,22 +18,23 @@ class BarberController extends Controller
             return $response;
         }
 
-        $query = Barber::query();
+        $fetch = fn () => Barber::query()
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('nama', 'like', "%{$search}%")
+                       ->orWhere('spesialisasi', 'like', "%{$search}%")
+                       ->orWhere('no_hp', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('nama')->paginate(15);
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
+        $hasFilter = $request->filled('status') || $request->filled('search');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('spesialisasi', 'like', "%{$search}%")
-                  ->orWhere('no_hp', 'like', "%{$search}%");
-            });
-        }
-
-        $barbers = $query->orderBy('nama')->paginate(15);
+        $barbers = $hasFilter
+            ? $fetch()
+            : $this->rememberAdminList('barber', 'p' . $request->integer('page', 1), $fetch);
 
         return view('backend.v_barber.index', [
             'judul'   => 'Data Barber',
@@ -74,6 +76,7 @@ class BarberController extends Controller
         }
 
         Barber::create($data);
+        $this->forgetAdminList('barber');
 
         return redirect()->route('backend.barber.index')
             ->with('success', 'Barber berhasil ditambahkan.');
@@ -128,6 +131,7 @@ class BarberController extends Controller
         }
 
         $barber->update($data);
+        $this->forgetAdminList('barber');
 
         return redirect()->route('backend.barber.index')
             ->with('success', 'Data barber berhasil diperbarui.');
@@ -144,6 +148,7 @@ class BarberController extends Controller
         }
 
         $barber->delete();
+        $this->forgetAdminList('barber');
 
         return redirect()->route('backend.barber.index')
             ->with('success', 'Barber berhasil dihapus.');

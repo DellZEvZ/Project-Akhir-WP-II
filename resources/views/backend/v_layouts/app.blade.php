@@ -307,9 +307,17 @@
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+    <!-- htmx: boosts navigation (link clicks & form submits) into AJAX requests,
+         so <body> gets swapped instead of a full reload -> already-loaded CSS/JS
+         doesn't need to be re-parsed. File-upload forms (enctype="multipart/form-data")
+         are marked hx-boost="false" per view so they still submit normally
+         (htmx's boosted file-upload behavior isn't consistently tested across
+         browsers yet). -->
+    <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
 </head>
 
-<body>
+<body hx-boost="true">
     <!-- ============================================================== -->
     <!-- Preloader - style you can find in spinners.css -->
     <!-- ============================================================== -->
@@ -752,11 +760,13 @@
     <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
     <!-- <script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script> -->
     <script>
-        ClassicEditor
-            .create(document.querySelector('#ckeditor'))
-            .catch(error => {
-                console.error(error);
-            });
+        if (document.querySelector('#ckeditor')) {
+            ClassicEditor
+                .create(document.querySelector('#ckeditor'))
+                .catch(error => {
+                    console.error(error);
+                });
+        }
     </script>
     <!-- CKEditor End -->
 

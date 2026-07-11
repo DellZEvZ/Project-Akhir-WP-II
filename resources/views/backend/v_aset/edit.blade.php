@@ -21,7 +21,7 @@
             <div class="card-body">
                 <h5 class="card-title mb-4">Form Edit Aset/Inventaris</h5>
 
-                <form action="{{ route('backend.aset.update', $aset->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('backend.aset.update', $aset->id) }}" method="POST" enctype="multipart/form-data" hx-boost="false">
                     @csrf
                     @method('PUT')
 

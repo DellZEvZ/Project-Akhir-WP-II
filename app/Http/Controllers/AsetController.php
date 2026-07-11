@@ -7,10 +7,11 @@ use App\Models\Aset;
 use App\Helpers\ImageHelper;
 use App\Helpers\ActivityLogger;
 use App\Traits\HasPermissionCheck;
+use App\Traits\CachesAdminList;
 
 class AsetController extends Controller
 {
-    use HasPermissionCheck;
+    use HasPermissionCheck, CachesAdminList;
     /**
      * Display a listing of the resource.
      */
@@ -21,35 +22,27 @@ class AsetController extends Controller
             return $response;
         }
 
-        $query = Aset::query();
+        $fetch = fn () => Aset::query()
+            ->when($request->filled('status'), fn ($q) => $q->where('status_aset', $request->status))
+            ->when($request->filled('kategori'), fn ($q) => $q->where('kategori', $request->kategori))
+            ->when($request->filled('lokasi'), fn ($q) => $q->where('lokasi', $request->lokasi))
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('nama_aset', 'like', "%{$search}%")
+                       ->orWhere('kode_aset', 'like', "%{$search}%")
+                       ->orWhere('supplier', 'like', "%{$search}%")
+                       ->orWhere('lokasi', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('updated_at', 'desc')->paginate(15);
 
-        // Filter berdasarkan status
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status_aset', $request->status);
-        }
+        $hasFilter = $request->filled('status') || $request->filled('kategori')
+            || $request->filled('lokasi') || $request->filled('search');
 
-        // Filter berdasarkan kategori
-        if ($request->has('kategori') && $request->kategori != '') {
-            $query->where('kategori', $request->kategori);
-        }
-
-        // Filter berdasarkan lokasi
-        if ($request->has('lokasi') && $request->lokasi != '') {
-            $query->where('lokasi', $request->lokasi);
-        }
-
-        // Search berdasarkan nama, kode, atau supplier
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nama_aset', 'like', "%{$search}%")
-                  ->orWhere('kode_aset', 'like', "%{$search}%")
-                  ->orWhere('supplier', 'like', "%{$search}%")
-                  ->orWhere('lokasi', 'like', "%{$search}%");
-            });
-        }
-
-        $aset = $query->orderBy('updated_at', 'desc')->paginate(15);
+        $aset = $hasFilter
+            ? $fetch()
+            : $this->rememberAdminList('aset', 'p' . $request->integer('page', 1), $fetch);
 
         return view('backend.v_aset.index', [
             'judul' => 'Data Aset / Inventaris',
@@ -138,6 +131,7 @@ class AsetController extends Controller
 
         // Log activity
         ActivityLogger::created('aset', $aset->nama_aset, $aset);
+        $this->forgetAdminList('aset');
 
         return redirect()
             ->route('backend.aset.index')
@@ -259,6 +253,7 @@ class AsetController extends Controller
         // Log activity
         $newData = $aset->only(['nama_aset', 'kode_aset', 'kategori', 'status_aset', 'lokasi']);
         ActivityLogger::updated('aset', $aset->nama_aset, $aset, $oldData, $newData);
+        $this->forgetAdminList('aset');
 
         return redirect()
             ->route('backend.aset.index')
@@ -299,6 +294,7 @@ class AsetController extends Controller
 
         // Hapus data aset dari database
         $aset->delete();
+        $this->forgetAdminList('aset');
 
         return redirect()
             ->route('backend.aset.index')
